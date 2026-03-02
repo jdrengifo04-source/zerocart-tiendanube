@@ -34,3 +34,28 @@ export const registerBuyNowScript = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Fallo al registrar el script en la tienda' });
     }
 };
+
+export const handleOrderPaidWebhook = async (req: Request, res: Response) => {
+    try {
+        const orderData = req.body;
+        console.log(`💰 Webhook Recibido: Pedido Pago #${orderData.id}`);
+
+        if (orderData.status === 'paid') {
+            const description = `Zerocart Fee - Pedido #${orderData.id}`;
+            const amount = 0.15;
+            const currency = orderData.main_currency || 'USD';
+
+            console.log(`💸 Intentando cobrar ${amount} ${currency} por comisión de Zerocart...`);
+            const chargeResult = await tnService.createCharge(description, amount, currency);
+
+            console.log('✅ Cobro registrado en Tiendanube:', chargeResult.id);
+            res.json({ message: 'Cobro realizado', charge_id: chargeResult.id });
+        } else {
+            res.status(200).json({ message: 'Ignorado' });
+        }
+    } catch (error: any) {
+        console.error('❌ Error facturación:', error.response?.data || error.message);
+        res.status(200).json({ error: 'Fallo al procesar cobro' });
+    }
+};
+
