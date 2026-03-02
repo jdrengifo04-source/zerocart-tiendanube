@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, FileText, BarChart3, Settings, ShieldCheck, Download, Save, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingBag, FileText, BarChart3, Settings, ShieldCheck, Save, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 
 interface Product {
