@@ -14,7 +14,7 @@ RUN cd backend && npm install
 
 # Copiar el código del backend
 COPY backend/ ./backend/
-# Copiar el build del frontend a una carpeta específica en el backend
+# Copiar el build del frontend a la carpeta de archivos estáticos del backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/client-dist
 
 # Variables de entorno por defecto
@@ -24,8 +24,12 @@ ENV NODE_ENV=production
 EXPOSE 3001
 
 WORKDIR /app/backend
-# Generar el cliente de Prisma para el entorno de producción (Linux)
+# Generar el cliente de Prisma
 RUN npx prisma generate
+# Compilar el backend de TS a JS
+RUN npm run build
 
-# Comando para arrancar (usamos ts-node-esm para no complicar el build de TS por ahora)
-CMD ["npx", "ts-node", "--esm", "src/index.ts"]
+# Comando para arrancar: 
+# 1. Empuja las migraciones de la base de datos
+# 2. Arranca el servidor usando Node (más rápido y estable que ts-node)
+CMD npx prisma migrate deploy && npm start
