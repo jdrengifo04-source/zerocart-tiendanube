@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.ts';
 
@@ -20,24 +21,35 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Servir archivos estáticos (Scripts inyectables)
+// 1. SERVIR SCRIPTS INYECTABLES (Para Tiendanube)
+// Estos viven en la carpeta /public local
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
-// Rutas de prueba
-
+// Rutas de API
 app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'Zerocart Backend is running', timestamp: new Date() });
 });
 
-// Rutas de Tiendanube
 app.get('/api/products', getProducts);
 app.put('/api/products/link', updateProductLink);
 app.post('/api/install-scripts', registerBuyNowScript);
-
-
-// Webhooks
 app.post('/api/webhooks/order-paid', handleOrderPaidWebhook);
 
+// 2. SERVIR FRONTEND DE ADMINISTRACIÓN (React)
+// Buscamos la carpeta client-dist que genera el Dockerfile en producción
+const clientDistPath = path.join(__dirname, '../client-dist');
+
+if (fs.existsSync(clientDistPath)) {
+    console.log('Modo Producción: Sirviendo frontend desde client-dist');
+    app.use(express.static(clientDistPath));
+
+    // Cualquier ruta que no sea API, entrega el index.html de React
+    app.get('*', (req: Request, res: Response) => {
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.join(clientDistPath, 'index.html'));
+        }
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Zerocart Backend escuchando en http://localhost:${PORT}`);
