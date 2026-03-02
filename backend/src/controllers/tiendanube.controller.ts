@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 import { TiendanubeService } from '../services/tiendanube.service.js';
 import prisma from '../lib/prisma.js';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 
 const STORE_ID = process.env.TEST_STORE_ID || '';
 const ACCESS_TOKEN = process.env.TEST_ACCESS_TOKEN || '';

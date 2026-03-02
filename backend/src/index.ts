@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-// Intentar cargar .env desde la raíz del proyecto (funciona en local y en EasyPanel)
-dotenv.config();
+import 'dotenv/config';
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
