@@ -1,17 +1,18 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargar variables de entorno (Prioridad a las del sistema en EasyPanel)
+// ¡IMPORTANTE! Cargar variables ANTES de importar controladores o servicios
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import fs from 'fs';
+import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
