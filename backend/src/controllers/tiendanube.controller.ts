@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { TiendanubeService } from '../services/tiendanube.service.ts';
+import prisma from '../lib/prisma.ts';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,13 +17,51 @@ const tnService = new TiendanubeService(STORE_ID, ACCESS_TOKEN);
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
-        const products = await tnService.getProducts();
-        res.json(products);
+        const tnProducts = await tnService.getProducts();
+
+        // Obtener los links guardados en nuestra DB
+        const dbProducts = await prisma.product.findMany({
+            where: { storeId: STORE_ID }
+        });
+
+        // Combinar datos
+        const productsWithLinks = tnProducts.map((p: any) => {
+            const dbProduct = dbProducts.find((dp: any) => dp.id === p.id.toString());
+            return {
+
+                ...p,
+                googleDriveLink: dbProduct?.googleDriveLink || ''
+            };
+        });
+
+        res.json(productsWithLinks);
     } catch (error: any) {
         console.error('Error obteniendo productos:', error.response?.data || error.message);
-        res.status(500).json({ error: 'No se pudieron obtener los productos de Tiendanube' });
+        res.status(500).json({ error: 'No se pudieron obtener los productos' });
     }
 };
+
+export const updateProductLink = async (req: Request, res: Response) => {
+    try {
+        const { productId, googleDriveLink } = req.body;
+
+        const product = await prisma.product.upsert({
+            where: { id: productId.toString() },
+            update: { googleDriveLink },
+            create: {
+                id: productId.toString(),
+                storeId: STORE_ID,
+                googleDriveLink
+            }
+        });
+
+        res.json({ message: 'Link actualizado con éxito', product });
+    } catch (error: any) {
+        console.error('Error guardando link:', error.message);
+        res.status(500).json({ error: 'No se pudo guardar el link' });
+    }
+};
+
 
 export const registerBuyNowScript = async (req: Request, res: Response) => {
     try {

@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getProducts, registerBuyNowScript, handleOrderPaidWebhook } from './controllers/tiendanube.controller.ts';
+import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,13 +24,16 @@ app.use(morgan('dev'));
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
 // Rutas de prueba
+
 app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'Zerocart Backend is running', timestamp: new Date() });
 });
 
 // Rutas de Tiendanube
 app.get('/api/products', getProducts);
+app.put('/api/products/link', updateProductLink);
 app.post('/api/install-scripts', registerBuyNowScript);
+
 
 // Webhooks
 app.post('/api/webhooks/order-paid', handleOrderPaidWebhook);
