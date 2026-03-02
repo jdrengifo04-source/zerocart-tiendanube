@@ -46,9 +46,12 @@ if (fs.existsSync(clientDistPath)) {
     console.log('Modo Producción: Sirviendo frontend desde client-dist');
     app.use(express.static(clientDistPath));
 
-    app.get('/(.*)', (req: Request, res: Response) => {
+    // Catch-all para SPA (seguro para Express 4 y 5)
+    app.use((req: Request, res: Response) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(clientDistPath, 'index.html'));
+        } else {
+            res.status(404).json({ error: 'Endpoint de API no encontrado' });
         }
     });
 }
