@@ -46,7 +46,7 @@ if (fs.existsSync(clientDistPath)) {
     console.log('Modo Producción: Sirviendo frontend desde client-dist');
     app.use(express.static(clientDistPath));
 
-    app.get('*', (req: Request, res: Response) => {
+    app.get('/(.*)', (req: Request, res: Response) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(clientDistPath, 'index.html'));
         }
