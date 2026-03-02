@@ -14,9 +14,20 @@ datasource db {
 }
 
 
+model Store {
+  id           String    @id // ID de Tiendanube
+  accessToken  String
+  storeName    String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+}
+
 model Product {
   id              String   @id // ID de Tiendanube
-  storeId         String   // Para identificar de qué tienda es el producto
+  storeId         String   // FK hacia Store
+  store           Store    @relation(fields: [storeId], references: [id])
   googleDriveLink String?  // El link de Drive (opcional al inicio)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

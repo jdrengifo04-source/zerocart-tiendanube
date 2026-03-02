@@ -7,6 +7,8 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.js';
+import { handleTiendanubeCallback } from './controllers/auth.controller.js';
+import { authStore } from './middleware/authStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,10 +36,16 @@ app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'Zerocart Backend is running', timestamp: new Date() });
 });
 
-app.get('/api/products', getProducts);
-app.put('/api/products/link', updateProductLink);
-app.post('/api/install-scripts', registerBuyNowScript);
+// Auth Handshake (OAuth) - No requiere middleware de tienda porque lo ESTÁ CREANDO
+app.get('/auth/tn/callback', handleTiendanubeCallback);
+
+// Webhooks - Identificación de tienda interna
 app.post('/api/webhooks/order-paid', handleOrderPaidWebhook);
+
+// Rutas Protegidas por Store Context
+app.get('/api/products', authStore, getProducts);
+app.put('/api/products/link', authStore, updateProductLink);
+app.post('/api/install-scripts', authStore, registerBuyNowScript);
 
 // 2. SERVIR FRONTEND DE ADMINISTRACIÓN (React)
 const clientDistPath = path.join(__dirname, '../client-dist');

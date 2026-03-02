@@ -1,37 +1,41 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, FileText, BarChart3, Settings, ShieldCheck, Save, ExternalLink } from 'lucide-react';
+import { ShoppingBag, FileText, Settings, ShieldCheck, Save, ExternalLink, RefreshCw, LayoutDashboard } from 'lucide-react';
 import axios from 'axios';
+
+// Importar componentes de speed-code (si no están en index, lo hacemos por path o intentamos el general)
+import { Button, Card, Input } from 'speed-code';
 
 interface Product {
   id: number;
-  name: any;
+  name: string;
   price: string;
   googleDriveLink: string;
-  status?: string;
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<number | null>(null);
 
+  // Obtener store_id de la URL
+  const queryParams = new URLSearchParams(window.location.search);
+  const storeId = queryParams.get('store_id') || localStorage.getItem('zerocart_store_id') || '';
+
   useEffect(() => {
+    if (storeId) {
+      localStorage.setItem('zerocart_store_id', storeId);
+      // Configurar axios para enviar el storeId en todas las peticiones
+      axios.defaults.headers.common['x-store-id'] = storeId;
+    }
     fetchProducts();
-  }, []);
+  }, [storeId]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/api/products');
-      // Mapear los datos de Tiendanube a nuestra interfaz
-      const mappedProducts = response.data.map((p: any) => ({
-        id: p.id,
-        name: p.name.es || Object.values(p.name)[0],
-        price: `${p.currency} ${p.price}`,
-        googleDriveLink: p.googleDriveLink || ''
-      }));
-      setProducts(mappedProducts);
+      setProducts(response.data);
     } catch (error) {
       console.error('Error cargando productos:', error);
     } finally {
@@ -47,7 +51,6 @@ function App() {
     try {
       setSaving(productId);
       await axios.put('/api/products/link', { productId, googleDriveLink: link });
-      alert('¡Enlace guardado con éxito!');
     } catch (error) {
       console.error('Error guardando enlace:', error);
       alert('Fallo al guardar el enlace');
@@ -57,145 +60,130 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-950 text-gray-100 w-full overflow-hidden font-sans">
-      {/* Sidebar - Aesthetic Premium */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col p-6 space-y-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <ShoppingBag className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-            Zerocart
-          </span>
-        </div>
+    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans selection:bg-emerald-500/30">
 
-        <nav className="flex-1 space-y-2">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
-          >
-            <div className="flex items-center space-x-3">
-              <BarChart3 className="w-5 h-5" />
-              <span className="font-medium">Dashboard</span>
+      {/* Sidebar - Premium Style de Speed Code */}
+      <div className="flex">
+        <aside className="w-72 h-screen border-r border-slate-800 bg-[#020617]/50 backdrop-blur-xl sticky top-0 flex flex-col p-8">
+          <div className="flex items-center gap-3 mb-12">
+            <div className="p-2 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl shadow-lg shadow-emerald-500/20">
+              <ShoppingBag className="w-6 h-6 text-slate-900 font-bold" />
             </div>
-          </button>
+            <h1 className="text-2xl font-black tracking-tighter text-white uppercase">Zerocart</h1>
+          </div>
 
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${activeTab === 'products' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
-          >
-            <div className="flex items-center space-x-3">
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Mis Productos Digitales</span>
+          <nav className="flex-1 space-y-2">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'products', label: 'Productos', icon: FileText },
+              { id: 'settings', label: 'Configuración', icon: Settings }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-bold text-sm ${activeTab === item.id
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-inner'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+                  }`}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <footer className="mt-auto">
+            <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="text-[10px] uppercase font-black tracking-widest">Cuenta Activa</span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-tight">ID: {storeId || 'Tienda de Prueba'}</p>
             </div>
-          </button>
+          </footer>
+        </aside>
 
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
-          >
-            <div className="flex items-center space-x-3">
-              <Settings className="w-5 h-5" />
-              <span className="font-medium">Configuración</span>
+        {/* Dynamic Content */}
+        <main className="flex-1 p-12 bg-gradient-to-br from-[#020617] via-[#020617] to-cyan-950/10">
+          <header className="flex justify-between items-end mb-12">
+            <div>
+              <p className="text-emerald-400 font-bold text-xs uppercase tracking-[0.2em] mb-2">Panel Administrativo</p>
+              <h2 className="text-5xl font-black text-white tracking-tight">
+                {activeTab === 'dashboard' ? 'Métricas' : 'Catálogo Digital'}
+              </h2>
             </div>
-          </button>
-        </nav>
-
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-4 rounded-2xl border border-gray-700/50">
-          <div className="flex items-center space-x-2 text-cyan-400 mb-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-wider">Plan VIP Hostinger</span>
-          </div>
-          <p className="text-xs text-gray-400 leading-relaxed font-medium">
-            Factura por transacción activada. Tarifa: $0.15 por venta.
-          </p>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-10 bg-[radial-gradient(circle_at_top_right,_#1c1917_0%,_#030712_100%)]">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">
-              {activeTab === 'dashboard' ? 'Resumen de Ventas' : 'Enlaces de Google Drive'}
-            </h1>
-            <p className="text-gray-400 font-medium">Gestiona tus productos y automatiza la entrega instantánea.</p>
-          </div>
-          <div className="flex space-x-3">
-            <button onClick={fetchProducts} className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all border border-gray-700 flex items-center space-x-2">
-              <span>Actualizar Tienda</span>
-            </button>
-            <button className="bg-cyan-500 hover:bg-cyan-400 text-black px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/20">
-              Panel Tiendanube
-            </button>
-          </div>
-        </header>
-
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-          </div>
-        ) : (
-          <>
-            {/* Table - Products */}
-            <div className="bg-gray-950/40 rounded-3xl border border-gray-800/50 overflow-hidden shadow-2xl">
-              <table className="w-full text-left">
-                <thead className="bg-gray-900/80">
-                  <tr>
-                    <th className="px-6 py-5 text-gray-300 font-bold uppercase text-xs tracking-wider">Producto (Tiendanube)</th>
-                    <th className="px-6 py-5 text-gray-300 font-bold uppercase text-xs tracking-wider">Precio</th>
-                    <th className="px-6 py-5 text-gray-300 font-bold uppercase text-xs tracking-wider">Enlace Google Drive</th>
-                    <th className="px-6 py-5 text-gray-300 font-bold uppercase text-xs tracking-wider">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800/50">
-                  {products.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-800/20 transition-colors group">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center">
-                            <FileText className="w-5 h-5 text-cyan-400" />
-                          </div>
-                          <span className="font-bold text-gray-200">{p.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 font-medium text-gray-400">{p.price}</td>
-                      <td className="px-6 py-5">
-                        <div className="relative group/input max-w-md">
-                          <input
-                            type="text"
-                            className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-sm text-cyan-50 font-medium focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all outline-none"
-                            placeholder="Pegar enlace de Google Drive..."
-                            value={p.googleDriveLink}
-                            onChange={(e) => handleLinkChange(p.id, e.target.value)}
-                          />
-                          {p.googleDriveLink && (
-                            <a href={p.googleDriveLink} target="_blank" rel="noreferrer" className="absolute right-3 top-2.5 text-gray-500 hover:text-cyan-400 transition-colors">
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <button
-                          onClick={() => saveLink(p.id, p.googleDriveLink)}
-                          disabled={saving === p.id}
-                          className={`flex items-center space-x-2 font-bold text-sm px-4 py-2 rounded-lg transition-all ${saving === p.id ? 'bg-gray-700 text-gray-400' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500 hover:text-black hover:shadow-cyan-500/30'}`}
-                        >
-                          <Save className="w-4 h-4" />
-                          <span>{saving === p.id ? 'Guardando...' : 'Guardar'}</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                onClick={fetchProducts}
+                className="rounded-xl border-slate-700 bg-slate-900/50 text-slate-300 hover:bg-slate-800"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Sincronizar
+              </Button>
+              <Button className="rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-8">
+                Ir a Tiendanube
+              </Button>
             </div>
-          </>
-        )}
-      </main>
+          </header>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-900/50 rounded-3xl border border-slate-800" />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              {products.length === 0 ? (
+                <Card className="p-20 text-center border-dashed border-2 border-slate-800 bg-transparent flex flex-col items-center">
+                  <ShoppingBag className="w-12 h-12 text-slate-700 mb-4" />
+                  <h3 className="text-xl font-bold text-slate-400">No hay productos vinculados</h3>
+                  <p className="text-slate-600">Actualiza tu tienda para importar productos de Tiendanube.</p>
+                </Card>
+              ) : (
+                products.map((p) => (
+                  <Card key={p.id} className="p-6 bg-slate-900/30 border-slate-800/50 flex items-center gap-8 group hover:border-emerald-500/30 transition-all duration-500 hover:bg-slate-900/50">
+                    <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                      <FileText className="w-8 h-8" />
+                    </div>
+
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{p.name}</h4>
+                      <p className="text-slate-500 font-medium text-sm">{p.price}</p>
+                    </div>
+
+                    <div className="w-2/5 relative">
+                      <label className="text-[10px] uppercase font-black tracking-widest text-slate-600 mb-2 block">Google Drive Link</label>
+                      <Input
+                        placeholder="https://drive.google.com/..."
+                        value={p.googleDriveLink}
+                        onChange={(e) => handleLinkChange(p.id, e.target.value)}
+                        className="bg-slate-950/50 border-slate-800 rounded-xl focus:ring-emerald-500/20 pr-10 text-emerald-50 font-medium h-12"
+                      />
+                      {p.googleDriveLink && (
+                        <a href={p.googleDriveLink} target="_blank" rel="noreferrer" className="absolute right-3 top-9 text-slate-600 hover:text-emerald-400 transition-colors">
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+
+                    <Button
+                      onClick={() => saveLink(p.id, p.googleDriveLink)}
+                      disabled={saving === p.id}
+                      className={`rounded-2xl h-12 px-6 ${saving === p.id ? 'bg-slate-800' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-slate-950'}`}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {saving === p.id ? '...' : 'Guardar'}
+                    </Button>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
 
 export default App;
+
