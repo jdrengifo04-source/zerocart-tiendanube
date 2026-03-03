@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZeroCart - Gestión de Productos</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0052FF",
+                        "background-light": "#fcfcfd",
+                        "background-dark": "#0f1115",
+                        "card-light": "#ffffff",
+                        "card-dark": "#16191f",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "8px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-item-active {
+            background-color: rgba(0, 82, 255, 0.08);
+            color: #0052FF;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased min-h-screen flex">
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-screen bg-card-light dark:bg-card-dark z-20">
+<div class="p-6">
+<img alt="ZeroCart Logo" class="h-7 dark:invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV1viNKshkM4gLScTNX9r5v5LimSE8KYEU4GoYsBM-xkQr3m0BQhG0QFPVKLpcR3VhqgvrH0PuMWKFwS9lPg7weHySdl7-UtNw9Cz3NBl7ZZL0UFWsmnk0s7Z_CXbGjolBSbyL2zqJlzTWjdD6uUhh1xOgGBaZY1i_oXzcZ-MzNlCkEhck4JAzSXreoIQP53BjGc9Z-wtd2R4zU3l9U4n50w8J2woFiW-rSYCcTFT7BNHsS3nYL3LpIDrKEQfEfwb0RoSaoFRulow"/>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-icons-round text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2 rounded-md sidebar-item-active" href="#">
+<span class="material-icons-round text-[20px]">inventory_2</span>
+<span class="text-sm font-medium">Productos</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-icons-round text-[20px]">settings</span>
+<span class="text-sm font-medium">Ajustes</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-200 dark:border-slate-800">
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado Tienda</span>
+<span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400">Conectado a Tiendanube</p>
+<div class="mt-3 w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[85%]"></div>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Sincronizado hace 5 min</p>
+</div>
+</div>
+</aside>
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-card-light/80 dark:bg-card-dark/80 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-slate-500" placeholder="Buscar productos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<button class="flex items-center space-x-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons-round text-[18px]">sync</span>
+<span>Sincronizar</span>
+</button>
+<div class="flex items-center space-x-3 border-l border-slate-200 dark:border-slate-700 pl-6">
+<div class="text-right">
+<p class="text-sm font-semibold">Admin ZeroCart</p>
+<p class="text-[10px] text-slate-500 font-medium uppercase">v1.2.0 Stable</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+                        AZ
+                    </div>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto w-full">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h1 class="text-2xl font-bold tracking-tight">Tus Productos</h1>
+<p class="text-slate-500 text-sm mt-1">Gestiona los enlaces de descarga digital para tus productos físicos.</p>
+</div>
+<div class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1.5 text-xs font-medium bg-white dark:bg-slate-700 shadow-sm rounded-md">Todos</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors">Vinculados</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors">Sin enlace</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5">
+<div class="flex items-start space-x-4">
+<img alt="Product thumbnail" class="w-16 h-16 rounded-lg object-cover bg-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTp2F3Tc35rIhJIIvhrrop8WFLu0f095B3YdW-p15HKihihKajBGCdIVDAck9kswGi-J9kuhLf0gOGaLBghB9UK3Ejvfxew0uIvnhZ1LV1U0RgmG8OBKtPedsnELQyTd03Tb9K2u-S9sIy9FGJtwYJulOQ_-8WqerDmjNcZ_n41iW2mSTtmEsfrCIlA5W6JYbdRPzBJeCv54ug1tVum0Tpitv6c_eKrVrKHX-a65B0ldhze7a3HWf3Hobqg3Ta4rAPNGe9MxlRnyE"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">Vinculado</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">$12.500</span>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white truncate">Cámara Mirrorless X-T4</h3>
+<p class="text-xs text-slate-500">ID: TN-9482</p>
+</div>
+</div>
+<div class="mt-6 space-y-4">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Google Drive Link</label>
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">link</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 focus:ring-primary focus:border-primary" type="text" value="drive.google.com/file/d/1Xy..."/>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+<span class="material-icons-round text-[18px]">check_circle</span>
+<span>Guardar</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5">
+<div class="flex items-start space-x-4">
+<img alt="Product thumbnail" class="w-16 h-16 rounded-lg object-cover bg-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcUqLHK1NMnRJnJCVbqklWZmxf3aT7OGbK4Py_adqrrXmLY3vs4TyR1cVAeyoQaExAQe-r8sUp0-cmaQyD77dj5YuUiSbyLw7sd7iJ8ZTtN-hM0KezJ7Goa4Lx23zfqv83QWeRaNYP25iYvQIXmCz9v4HuuTGU1oxahUm701SuPpwK-K2ymzZbtn2EzGmMqEQOinpyI6hKgPSSX8PdYNHTZEVzoQt2WYa06RuBWR0jGOGZpHZUdvjUBNvdK9NAgtXlJ7NflY7LOyo"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Sin enlace</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">$8.200</span>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white truncate">Auriculares Noise Cancelling</h3>
+<p class="text-xs text-slate-500">ID: TN-3210</p>
+</div>
+</div>
+<div class="mt-6 space-y-4">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Google Drive Link</label>
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">add_link</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" placeholder="Pegar enlace de Google Drive" type="text"/>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+<span>Vincular Contenido</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5">
+<div class="flex items-start space-x-4">
+<img alt="Product thumbnail" class="w-16 h-16 rounded-lg object-cover bg-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV4MPoFvPISUYtQfE1RYfVsRhobCeXJodrMx6Ixs8T5Dp8nJlr0qJl7-ngdIa4hDGfZd16Iga4whxdJa6gS-j-95nT_Ss6_xyVsGuSuuBCNPxIRYOEBY9ga9ZUQj9WZJ5_zngkNQnhUtREkgqbIrwi2acztyUpCy1GRHPghtjEKgWZw1AoE1uwk7imQQaSLwOvKJmXxMHEeFMi1QsbN8WT5DfuqduSsqlT-AaxrK59-pNUHFiR6hR7PyyLUTV7qxPhJ7bChOR3CaY"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">Vinculado</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">$15.000</span>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white truncate">Reloj Inteligente Ultra</h3>
+<p class="text-xs text-slate-500">ID: TN-1155</p>
+</div>
+</div>
+<div class="mt-6 space-y-4">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Google Drive Link</label>
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">link</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 focus:ring-primary focus:border-primary" type="text" value="drive.google.com/file/d/2Ab..."/>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+<span class="material-icons-round text-[18px]">check_circle</span>
+<span>Guardar</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5">
+<div class="flex items-start space-x-4">
+<img alt="Product thumbnail" class="w-16 h-16 rounded-lg object-cover bg-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPLLZJORGTnCmGhOdtZTOgydOCAYoiLOeVBUH0kHVY8A3j-ZrB6-mdyZTTxk0QdFBwd5zYHAYv5q0iiVpFJ1YqY2c3ymlSFcJrN8Ihwkiv2XIBWOlEoEyTMsXSzCtFDVj9u9Ioi4fPwtrAN2FoiRK_KpZH7HEFUbkPKNNkkM0J7MqY53N0XsrF66PBNVA7O7MafWrEuIQEjnCA-SnreXWlapsrJIPPnNmGtPmKmWZ56k3tH66qbiNFETEiLyrmvmNSLgcTTn0YiQU"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Sin enlace</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">$18.900</span>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white truncate">Zapatillas Deportivas Pro</h3>
+<p class="text-xs text-slate-500">ID: TN-5521</p>
+</div>
+</div>
+<div class="mt-6 space-y-4">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Google Drive Link</label>
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">add_link</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" placeholder="Pegar enlace de Google Drive" type="text"/>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+<span>Vincular Contenido</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 flex items-center justify-between text-sm text-slate-500">
+<p>Mostrando 4 de 24 productos</p>
+<div class="flex space-x-2">
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50" disabled="">
+<span class="material-icons-round text-[18px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-md bg-slate-50 dark:bg-slate-800 font-medium">1</button>
+<button class="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">2</button>
+<button class="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">3</button>
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-icons-round text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<button class="fixed bottom-6 right-6 w-10 h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center shadow-lg text-slate-600 dark:text-slate-300 hover:scale-110 transition-transform" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-round text-[20px]">dark_mode</span>
+</button>
+
+</body></html>

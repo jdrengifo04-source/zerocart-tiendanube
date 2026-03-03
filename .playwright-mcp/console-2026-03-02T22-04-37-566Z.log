@@ -1,0 +1,17 @@
+[  501562ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/products:0
+[  501563ms] [ERROR] Error cargando productos: AxiosError: Request failed with status code 500
+    at settle (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:1319:7)
+    at XMLHttpRequest.onloadend (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:1682:7)
+    at Axios.request (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:2328:41)
+    at async fetchProducts (http://localhost:3000/src/App.tsx?t=1772489041929:38:24) @ http://localhost:3000/src/App.tsx?t=1772489041929:40
+[  501773ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/products:0
+[  501774ms] [ERROR] Error cargando productos: AxiosError: Request failed with status code 500
+    at settle (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:1319:7)
+    at XMLHttpRequest.onloadend (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:1682:7)
+    at Axios.request (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:2328:41)
+    at async fetchProducts (http://localhost:3000/src/App.tsx?t=1772489041929:38:24) @ http://localhost:3000/src/App.tsx?t=1772489041929:40
+[ 1540341ms] [ERROR] Error cargando productos: AxiosError: Network Error
+    at XMLHttpRequest.handleError (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:1717:19)
+    at Axios.request (http://localhost:3000/node_modules/.vite/deps/axios.js?v=237a37fd:2328:41)
+    at async fetchProducts (http://localhost:3000/src/App.tsx?t=1772489041929:38:24) @ http://localhost:3000/src/App.tsx?t=1772489041929:40
+[ 1540341ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:3000/api/products:0

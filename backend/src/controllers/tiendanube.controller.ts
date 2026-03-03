@@ -28,6 +28,7 @@ export const getProducts = async (req: Request, res: Response) => {
             return {
                 ...p,
                 name: p.name.es || Object.values(p.name)[0], // Normalizar el nombre aquí también por si acaso
+                image: p.images && p.images.length > 0 ? p.images[0].src : null,
                 googleDriveLink: dbProduct?.googleDriveLink || ''
             };
         });
@@ -112,5 +113,3 @@ export const handleOrderPaidWebhook = async (req: Request, res: Response) => {
         res.status(200).json({ error: 'Fallo al procesar cobro' });
     }
 };
-
-

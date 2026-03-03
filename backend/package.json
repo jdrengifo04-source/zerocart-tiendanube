@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "prisma:dev": "npx prisma@6.4.1 migrate dev",
@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "6.4.1",
     "axios": "^1.13.6",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
@@ -32,8 +32,9 @@
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.3.3",
-    "prisma": "^6.4.1",
+    "prisma": "6.4.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

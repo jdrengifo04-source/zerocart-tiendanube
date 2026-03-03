@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: "class",
     content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,8 +9,18 @@ export default {
     theme: {
         extend: {
             colors: {
-                'zerocart-primary': '#00bfa5', // Color temático sugerido
-            }
+                primary: "#0052FF",
+                "background-light": "#fcfcfd",
+                "background-dark": "#0f1115",
+                "card-light": "#ffffff",
+                "card-dark": "#16191f",
+            },
+            fontFamily: {
+                display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+                DEFAULT: "8px",
+            },
         },
     },
     plugins: [],

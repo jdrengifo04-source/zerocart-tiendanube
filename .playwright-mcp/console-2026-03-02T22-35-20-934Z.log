@@ -1,0 +1,3 @@
+[      81ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/src/index.css?t=1772490915791:0
+[    9020ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/src/index.css?t=1772490915791:0
+[   11408ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/src/index.css?t=1772490915791:0
