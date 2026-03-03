@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
     return (
         <aside className="w-68 bg-[#0a0f1d] flex flex-col shrink-0 z-20 shadow-2xl relative border-r border-white/5 dark">
-            <div className="p-8 pb-10">
+            <div className="p-8 pb-10 flex justify-center">
                 <img src="/logo-white.png" alt="ZeroCart Logo" className="h-6 w-auto opacity-100" />
             </div>
 
@@ -90,19 +90,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between px-2">
-                    <button onClick={toggleTheme} className="p-2 text-slate-400 hover:text-white transition-all bg-white/5 rounded-lg border border-white/5 hover:border-white/10">
+                <div className="flex items-center justify-center px-2">
+                    <button onClick={toggleTheme} className="p-2 text-slate-400 hover:text-white transition-all bg-white/5 rounded-lg border border-white/5 hover:border-white/10 w-full flex items-center justify-center gap-2">
                         {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+                        <span className="text-[11px] font-medium uppercase tracking-wider">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="text-right">
-                            <p className="text-[11px] font-bold text-white leading-tight">Admin</p>
-                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tighter opacity-80">v1.2.0 Stable</p>
-                        </div>
-                        <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs shadow-inner">
-                            AZ
-                        </div>
-                    </div>
                 </div>
             </div>
         </aside>
