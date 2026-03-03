@@ -45,7 +45,8 @@ body {
 
 /* Sidebar Active State (ExitBot Style) */
 .sidebar-active-glow {
-  background: linear-gradient(90deg, rgba(0, 82, 255, 0.15) 0%, rgba(0, 82, 255, 0.05) 100%);
+  background: rgba(0, 82, 255, 0.15);
+  /* More prominent brand blue */
   position: relative;
   overflow: hidden;
 }
@@ -54,12 +55,11 @@ body {
   content: '';
   position: absolute;
   left: 0;
-  top: 20%;
-  height: 60%;
+  top: 0;
+  height: 100%;
   width: 4px;
   background: #0052FF;
-  border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px rgba(0, 82, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 82, 255, 0.6);
 }
 
 /* Custom Smooth Scrollbar */
