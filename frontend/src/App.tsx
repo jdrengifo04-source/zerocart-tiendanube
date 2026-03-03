@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
 import {
-  Settings,
-  ShieldCheck,
-  Save,
-  ExternalLink,
   RefreshCw,
-  LayoutDashboard,
   Search,
-  CheckCircle,
-  AlertCircle,
-  User,
   Package,
-  MoreVertical,
-  ChevronRight,
-  Sun,
-  Moon
+  TrendingUp,
+  CreditCard,
+  CloudLightning
 } from 'lucide-react';
 import axios from 'axios';
 
+// Import local components
+import Sidebar from './components/Sidebar';
+import MetricCard from './components/MetricCard';
+import ProductCard from './components/ProductCard';
+
 // Import components from speed-code
-import { Button, Card, Input } from 'speed-code';
+import { Button, Card } from 'speed-code';
 
 interface Product {
   id: number;
@@ -113,90 +109,13 @@ function App() {
   return (
     <div className="flex h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden theme-transition">
 
-      {/* SIDEBAR - ExitBot Style */}
-      <aside className="w-68 bg-slate-950 flex flex-col shrink-0 z-20 shadow-2xl relative">
-        <div className="p-8 pb-12">
-          <img src="/logo-white.png" alt="ZeroCart Logo" className="h-7 w-auto" />
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
-          <div className="mb-8">
-            <p className="px-5 mb-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Menú Principal</p>
-            <nav className="space-y-1">
-              {[
-                { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                { id: 'products', label: 'Productos', icon: Package }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-5 py-3 rounded-xl transition-all duration-300 font-bold text-[13px] ${activeTab === item.id
-                    ? 'sidebar-active-glow text-white'
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
-                    }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon className={`w-4.5 h-4.5 ${activeTab === item.id ? 'text-primary' : 'text-slate-600'}`} />
-                    {item.label}
-                  </div>
-                  {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 text-primary" />}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="mb-8">
-            <p className="px-5 mb-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Configuración</p>
-            <nav className="space-y-1">
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center justify-between px-5 py-3 rounded-xl transition-all duration-300 font-bold text-[13px] ${activeTab === 'settings'
-                  ? 'sidebar-active-glow text-white'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
-                  }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Settings className={`w-4.5 h-4.5 ${activeTab === 'settings' ? 'text-primary' : 'text-slate-600'}`} />
-                  Ajustes
-                </div>
-                {activeTab === 'settings' && <ChevronRight className="w-3.5 h-3.5 text-primary" />}
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        {/* Footer Sidebar - ExitBot Style */}
-        <div className="p-4 border-t border-white/5">
-          <div className="bg-white/5 rounded-2xl p-4 mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black text-slate-500 uppercase">Estado</span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-status-pulse" />
-                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-wider">Live</span>
-              </div>
-            </div>
-            <p className="text-[11px] font-bold text-slate-300 truncate">Store #{storeId || '7317678'}</p>
-            <div className="mt-3 w-full bg-white/5 h-1 rounded-full overflow-hidden">
-              <div className="h-full bg-primary w-full" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between px-2">
-            <button onClick={toggleTheme} className="p-2 text-slate-500 hover:text-white transition-colors">
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-[11px] font-black text-white leading-tight">Admin</p>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">v1.2.0 Stable</p>
-              </div>
-              <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-black text-xs">
-                AZ
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        storeId={storeId}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col overflow-hidden relative theme-transition">
@@ -236,12 +155,12 @@ function App() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
               <div>
                 <h1 className="text-3xl font-sora font-extrabold text-slate-900 dark:text-white tracking-tightest mb-1.5">
-                  {activeTab === 'dashboard' ? 'Panel de Control' : 'Tus Productos'}
+                  {activeTab === 'dashboard' ? 'Panel de Control' : activeTab === 'products' ? 'Tus Productos' : 'Ajustes'}
                 </h1>
                 <p className="text-sm font-medium text-slate-500">
                   {activeTab === 'dashboard'
                     ? 'Gestiona tus automatizaciones y membresías en tiempo real.'
-                    : 'Gestiona los enlaces de descarga digital para tus productos físicos.'}
+                    : activeTab === 'products' ? 'Gestiona los enlaces de descarga digital para tus productos físicos.' : 'Configuración general de la aplicación.'}
                 </p>
               </div>
 
@@ -251,9 +170,9 @@ function App() {
                     <button
                       key={status}
                       onClick={() => setFilterStatus(status as FilterStatus)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${filterStatus === status
-                        ? 'bg-white dark:bg-white/10 text-primary shadow-sm'
-                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                      className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${filterStatus === status
+                        ? 'bg-white dark:bg-white/10 shadow-sm text-primary'
+                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                     >
                       {status === 'all' ? 'Todos' : status === 'linked' ? 'Vinculados' : 'Sin Enlace'}
@@ -263,131 +182,93 @@ function App() {
               )}
             </div>
 
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-64 bg-slate-100 dark:bg-white/5 rounded-2xl animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="transition-all duration-500">
-                {activeTab === 'dashboard' ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Horizontal KPI Cards - ExitBot Style */}
-                    <Card className="premium-card p-6 rounded-[24px] flex items-center gap-5">
-                      <div className="w-12 h-12 bg-blue-50 dark:bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                        <Package className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Total</p>
-                        <p className="text-2xl font-sora font-extrabold text-slate-900 dark:text-white">{products.length}</p>
-                      </div>
-                    </Card>
+            {activeTab === 'dashboard' ? (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <MetricCard
+                    label="Conversión"
+                    value="12.4%"
+                    icon={TrendingUp}
+                    subValue="+2.1% mes"
+                    trend="up"
+                  />
+                  <MetricCard
+                    label="Ventas Hoy"
+                    value="$1,420"
+                    icon={CreditCard}
+                    subValue="+15% ayer"
+                    trend="up"
+                  />
+                  <MetricCard
+                    label="Uptime API"
+                    value="99.9%"
+                    icon={CloudLightning}
+                    subValue="Excelente"
+                    trend="neutral"
+                  />
+                </div>
 
-                    <Card className="premium-card p-6 rounded-[24px] flex items-center gap-5">
-                      <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600">
-                        <CheckCircle className="w-6 h-6" />
+                <div className="bg-white dark:bg-white/5 rounded-[40px] p-10 border border-slate-200/50 dark:border-white/5 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -mr-48 -mt-48 group-hover:bg-primary/10 transition-all duration-700" />
+                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+                    <div className="flex-1 text-center md:text-left">
+                      <h2 className="text-4xl font-sora font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">
+                        Optimiza tus ventas automáticas
+                      </h2>
+                      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 max-w-xl font-medium">
+                        ZeroCart ahora sincroniza tus productos de Tiendanube con contenido digital en Google Drive para enviar correos automáticos.
+                      </p>
+                      <Button
+                        size="lg"
+                        onClick={() => setActiveTab('products')}
+                        className="rounded-2xl px-10 h-14 bg-primary text-white hover:bg-primary/90 font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"
+                      >
+                        Empezar Ahora
+                      </Button>
+                    </div>
+                    <div className="w-full md:w-80 h-80 bg-slate-100 dark:bg-white/5 rounded-[32px] border border-slate-200 dark:border-white/10 flex items-center justify-center p-8 group-hover:rotate-2 transition-transform duration-700">
+                      <div className="w-full aspect-square bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center p-6 border border-slate-100 dark:border-white/5">
+                        <img src="/logo-black.png" alt="Icon" className="dark:hidden w-full h-auto opacity-80" />
+                        <img src="/logo-white.png" alt="Icon" className="hidden dark:block w-full h-auto opacity-80" />
                       </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Vinculados</p>
-                        <p className="text-2xl font-sora font-extrabold text-slate-900 dark:text-white">
-                          {products.filter(p => p.googleDriveLink).length}
-                        </p>
-                      </div>
-                    </Card>
-
-                    <Card className="premium-card p-6 rounded-[24px] flex items-center gap-5">
-                      <div className="w-12 h-12 bg-orange-50 dark:bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-500">
-                        <AlertCircle className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Pendientes</p>
-                        <p className="text-2xl font-sora font-extrabold text-slate-900 dark:text-white">
-                          {products.filter(p => !p.googleDriveLink).length}
-                        </p>
-                      </div>
-                    </Card>
-
-                    <Card className="premium-card p-6 rounded-[24px] flex items-center gap-5">
-                      <div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400">
-                        <RefreshCw className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Logs</p>
-                        <p className="text-2xl font-sora font-extrabold text-slate-900 dark:text-white">128</p>
-                      </div>
-                    </Card>
+                    </div>
                   </div>
+                </div>
+              </div>
+            ) : activeTab === 'products' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {loading ? (
+                  Array(6).fill(0).map((_, i) => (
+                    <div key={i} className="h-80 rounded-3xl bg-slate-100 dark:bg-white/5 animate-pulse" />
+                  ))
+                ) : filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      saving={saving === product.id}
+                      onLinkChange={handleLinkChange}
+                      onSave={saveLink}
+                    />
+                  ))
                 ) : (
-                  /* PRODUCT GRID - Stitch Mockup Style */
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredProducts.map((p) => (
-                      <Card key={p.id} className="premium-card p-5 rounded-2xl flex flex-col h-full">
-                        <div className="flex items-start gap-4 mb-6">
-                          <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden shrink-0 flex items-center justify-center">
-                            {p.image ? (
-                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <Package className="w-6 h-6 text-slate-300" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1.5">
-                              {p.googleDriveLink ? (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-                                  Vinculado
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 text-slate-500">
-                                  Sin Enlace
-                                </span>
-                              )}
-                              <span className="text-sm font-bold text-slate-900 dark:text-white">{p.price}</span>
-                            </div>
-                            <h3 className="font-bold text-slate-900 dark:text-white truncate leading-tight mb-1">{p.name}</h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">ID: {p.id}</p>
-                          </div>
-                        </div>
-
-                        <div className="mt-auto space-y-4">
-                          <div>
-                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 p-0.5">Google Drive Link</label>
-                            <div className="relative group/input">
-                              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-primary transition-colors">
-                                <ExternalLink size={14} />
-                              </div>
-                              <Input
-                                placeholder="drive.google.com/file/..."
-                                value={p.googleDriveLink}
-                                onChange={(e) => handleLinkChange(p.id, e.target.value)}
-                                className="h-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-xs font-medium pl-9 pr-4 focus:ring-primary/10 transition-all dark:text-white"
-                              />
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => saveLink(p.id, p.googleDriveLink)}
-                            disabled={saving === p.id}
-                            className={`w-full h-10 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${saving === p.id
-                              ? 'bg-slate-100 dark:bg-white/5 text-slate-400'
-                              : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/10'
-                              }`}
-                          >
-                            {saving === p.id ? (
-                              <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : p.googleDriveLink ? (
-                              <>
-                                <Save className="w-4 h-4" />
-                                <span>Guardar Cambios</span>
-                              </>
-                            ) : (
-                              <span>Vincular Contenido</span>
-                            )}
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
+                  <div className="col-span-full py-20 text-center">
+                    <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
+                      <Package size={32} />
+                    </div>
+                    <p className="text-slate-500 font-bold">No se encontraron productos.</p>
                   </div>
                 )}
+              </div>
+            ) : (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card className="bg-white dark:bg-white/5 p-12 rounded-[40px] border-slate-200 dark:border-white/5 text-center">
+                  <h2 className="text-2xl font-sora font-extrabold text-slate-900 dark:text-white mb-4">Ajustes</h2>
+                  <p className="text-slate-500 font-medium max-w-md mx-auto">
+                    La configuración de la tienda y las credenciales de la API se gestionan automáticamente a través de Tiendanube.
+                  </p>
+                </Card>
               </div>
             )}
           </div>
