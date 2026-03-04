@@ -135,7 +135,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         const buyNowBtn = document.createElement('button');
         buyNowBtn.id = 'zerocart-buy-now';
-        buyNowBtn.innerHTML = '⚡ ${store.oneClickText || 'Comprar Ahora'}';
+        buyNowBtn.innerHTML = \`⚡ \${store.oneClickText || 'Comprar Ahora'}\`;
         buyNowBtn.type = 'button';
 
         container.appendChild(buyNowBtn);
