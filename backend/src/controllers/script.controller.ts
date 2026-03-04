@@ -157,7 +157,10 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                 });
 
                 if (response.ok) {
-                    window.location.href = '/checkout';
+                    console.log('✅ Zerocart: Producto agregado. Redirigiendo...');
+                    // Intentar usar URLs dinámicas de Tiendanube locales
+                    const checkoutUrl = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
+                    window.location.href = checkoutUrl;
                 } else {
                     throw new Error('Fallo en la API de Tiendanube');
                 }
