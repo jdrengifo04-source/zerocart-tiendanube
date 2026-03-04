@@ -3,3 +3,5 @@
 [  215489ms] Unexpected identifier 'as'
 [  216689ms] Unexpected identifier 'as'
 [  218122ms] Unexpected identifier 'as'
+[  421750ms] [ERROR] ❌ Zerocart: No se pudo identificar el Variant ID. @ https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=7317678:88
+[  475722ms] Timeout (o)

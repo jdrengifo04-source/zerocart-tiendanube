@@ -110,9 +110,28 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             buyNowBtn.innerHTML = 'Procesando...';
             buyNowBtn.disabled = true;
 
+            let variantId = null;
             const form = addToCartBtn.closest('form');
-            const variantInput = form ? form.querySelector('input[name="variant_id"]') : null;
-            const variantId = variantInput ? variantInput.value : null;
+            if (form) {
+                const variantInput = form.querySelector('input[name="variant_id"]');
+                const addToCartInput = form.querySelector('input[name="add_to_cart"]');
+                
+                if (variantInput && variantInput.value) {
+                    variantId = variantInput.value;
+                } else if (addToCartInput && addToCartInput.value) {
+                    // A veces add_to_cart es el Product ID, necesitamos el Variant ID
+                    if (window.LS && window.LS.variants && window.LS.variants.length > 0) {
+                        variantId = window.LS.variants[0].id;
+                    } else {
+                        variantId = addToCartInput.value;
+                    }
+                }
+            }
+
+            // Fallback final: si todavía no hay ID, probar con el primer variant de LS
+            if (!variantId && window.LS && window.LS.variants && window.LS.variants.length > 0) {
+                variantId = window.LS.variants[0].id;
+            }
 
             if (!variantId) {
                 console.error('❌ Zerocart: No se pudo identificar el Variant ID.');
@@ -121,6 +140,8 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                 buyNowBtn.remove();
                 return;
             }
+
+            console.log('🚀 Zerocart: Iniciando compra para Variant ID:', variantId);
 
             try {
                 const response = await fetch('/cart/add/', {
