@@ -256,80 +256,83 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
     }
 
     function renderDownloadCard(data) {
-        if (document.getElementById('zerocart-thank-you')) return;
+        console.log('✅ Zerocart: Preparando tarjeta de descarga para', data.products.length, 'productos.');
 
-        console.log('✅ Zerocart: Renderizando tarjeta de descarga para', data.products.length, 'productos.');
-
-        const style = document.createElement('style');
-        style.innerHTML = \`
-            .zerocart-thanks-card {
-                background: #ffffff;
-                border: 2px solid #e1e9ff;
-                border-radius: 12px;
-                padding: 25px;
-                margin: 20px 0;
-                box-shadow: 0 10px 25px rgba(0, 82, 255, 0.1);
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                text-align: center;
-            }
-            .zerocart-thanks-headline {
-                color: #1a1a1a;
-                font-size: 24px;
-                font-weight: 800;
-                margin-bottom: 10px;
-                display: block;
-            }
-            .zerocart-thanks-message {
-                color: #666;
-                font-size: 16px;
-                margin-bottom: 25px;
-                display: block;
-            }
-            .zerocart-item-row {
-                display: flex;
-                align-items: center;
-                background: #f8faff;
-                padding: 15px;
-                border-radius: 10px;
-                margin-bottom: 15px;
-                text-align: left;
-                gap: 15px;
-            }
-            .zerocart-item-img {
-                width: 60px;
-                height: 60px;
-                object-fit: cover;
-                border-radius: 8px;
-            }
-            .zerocart-item-info {
-                flex-grow: 1;
-            }
-            .zerocart-item-name {
-                font-weight: 700;
-                color: #333;
-                margin-bottom: 5px;
-                display: block;
-            }
-            .zerocart-item-btn {
-                background: #0052FF;
-                color: white !important;
-                padding: 10px 20px;
-                border-radius: 6px;
-                text-decoration: none !important;
-                font-weight: 600;
-                font-size: 14px;
-                display: inline-block;
-                transition: background 0.2s;
-            }
-            .zerocart-item-btn:hover {
-                background: #0041cc;
-            }
-        \`;
-        document.head.appendChild(style);
-
-        const card = document.createElement('div');
-        card.id = 'zerocart-thank-you';
-        card.className = 'zerocart-thanks-card';
+        if (!document.getElementById('zerocart-thanks-styles')) {
+            const style = document.createElement('style');
+            style.id = 'zerocart-thanks-styles';
+            style.innerHTML = \`
+                #zerocart-thank-you {
+                    background: #ffffff;
+                    border: 2px solid #e1e9ff;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin: 20px auto;
+                    max-width: 800px;
+                    width: 90%;
+                    box-shadow: 0 10px 25px rgba(0, 82, 255, 0.1);
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    text-align: center;
+                    position: relative;
+                    z-index: 999999;
+                    box-sizing: border-box;
+                    display: block !important;
+                }
+                .zerocart-thanks-headline {
+                    color: #1a1a1a;
+                    font-size: 24px;
+                    font-weight: 800;
+                    margin-bottom: 10px;
+                    display: block;
+                }
+                .zerocart-thanks-message {
+                    color: #666;
+                    font-size: 16px;
+                    margin-bottom: 25px;
+                    display: block;
+                }
+                .zerocart-item-row {
+                    display: flex;
+                    align-items: center;
+                    background: #f8faff;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 15px;
+                    text-align: left;
+                    gap: 15px;
+                }
+                .zerocart-item-img {
+                    width: 60px;
+                    height: 60px;
+                    object-fit: cover;
+                    border-radius: 8px;
+                }
+                .zerocart-item-info {
+                    flex-grow: 1;
+                }
+                .zerocart-item-name {
+                    font-weight: 700;
+                    color: #333;
+                    margin-bottom: 5px;
+                    display: block;
+                }
+                .zerocart-item-btn {
+                    background: #0052FF;
+                    color: white !important;
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    text-decoration: none !important;
+                    font-weight: 600;
+                    font-size: 14px;
+                    display: inline-block;
+                    transition: background 0.2s;
+                }
+                .zerocart-item-btn:hover {
+                    background: #0041cc;
+                }
+            \`;
+            document.head.appendChild(style);
+        }
 
         let productsHtml = '';
         data.products.forEach(p => {
@@ -345,7 +348,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             \`;
         });
 
-        card.innerHTML = \`
+        const htmlContent = \`
             <span class="zerocart-thanks-headline">\${data.config.headline}</span>
             <span class="zerocart-thanks-message">\${data.config.message}</span>
             <div class="zerocart-products-list">
@@ -353,13 +356,32 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             </div>
         \`;
 
-        // Tiendanube Checkout V3 suele tener un selector #checkout-header o .checkout-container
-        const target = document.querySelector('.checkout-container') || document.querySelector('header') || document.body.firstChild;
-        if (target === document.body.firstChild) {
-            document.body.insertBefore(card, target);
-        } else {
-            target.prepend(card);
+        // Función para inyectar si no existe (robusto contra SPAs de Tiendanube)
+        function inject() {
+            if (document.getElementById('zerocart-thank-you')) {
+                return; // Ya existe 
+            }
+            
+            console.log('✅ Zerocart: Renderizando (o re-renderizando) tarjeta en el DOM.');
+            const card = document.createElement('div');
+            card.id = 'zerocart-thank-you';
+            card.innerHTML = htmlContent;
+
+            // Intentar encontrar el contenedor principal del checkout V3
+            const targetNode = document.querySelector('.checkout__container') || 
+                               document.querySelector('.checkout-container') || 
+                               document.querySelector('main') || 
+                               document.querySelector('#proccess-success') ||
+                               document.body;
+                               
+            targetNode.prepend(card);
         }
+
+        // Inyectar inmediatamente
+        inject();
+
+        // Chequear cada 1 segundo si el SPA de Tiendanube borró nuestro elemento al renderizar
+        setInterval(inject, 1000);
     }
 
     if (document.readyState === 'loading') {
