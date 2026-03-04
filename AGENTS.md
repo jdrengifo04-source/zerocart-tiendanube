@@ -28,7 +28,10 @@ El proyecto es un monorepo simplificado:
 - ✅ Integración con Tiendanube consolidada:
   - Extracción de `price` y `promotional_price` desde `variants`.
 - ✅ Implementación visual "1 Click $": Vista Previa Móvil dinámica usando datos reales de la tienda.
+- ✅ Integración DB/API "1 Click $": Configuración guardada en PostgreSQL vía Prisma. Función de autoinyección del Script dinámico vía API de Tiendanube.
+- ✅ Permisos de Tiendanube configurados: Identificados y habilitados los alcances necesarios (Products, Scripts, Orders, Customers) para la próxima fase de Página de Gracias y Descarga de PDFs.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
+- 🔄 (Pendiente) Desarrollo de flujo "Página de Gracias" para entrega de PDFs vinculado al webhook de Orders.
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
 
 ## 📁 Documentación Detallada
