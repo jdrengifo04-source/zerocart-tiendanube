@@ -26,6 +26,12 @@ model Store {
   oneClickSize      String    @default("normal")
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  
+  // Configuración de Página de Gracias (Phase 2)
+  thankYouHeadline  String    @default("¡Tu compra ha sido aprobada!")
+  thankYouMessage   String    @default("Gracias por tu compra. Aquí tienes tu enlace de descarga.")
+  thankYouShowImage Boolean   @default(true)
+
   products          Product[]
 }
 

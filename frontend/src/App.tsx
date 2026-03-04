@@ -10,6 +10,7 @@ import axios from 'axios';
 import Sidebar from './components/Sidebar';
 import ProductCard from './components/ProductCard';
 import OneClickConfig from './components/OneClickConfig';
+import ThankYouConfig from './components/ThankYouConfig';
 
 import { Button } from 'speed-code';
 
@@ -158,12 +159,14 @@ function App() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
               <div>
                 <h1 className="text-3xl font-sora font-extrabold text-slate-900 dark:text-white tracking-tightest mb-1.5">
-                  {activeTab === 'dashboard' ? 'Tutorial de Configuración' : activeTab === 'one-click' ? 'Configurar 1 Click $' : 'Tus Productos'}
+                  {activeTab === 'dashboard' ? 'Tutorial de Configuración' : activeTab === 'one-click' ? 'Configurar 1 Click $' : activeTab === 'thank-you' ? 'Configurar Página de Gracias' : 'Tus Productos'}
                 </h1>
                 <p className="text-sm font-medium text-slate-500">
                   {activeTab === 'dashboard'
                     ? 'Aprende a configurar tu tienda y enlazar tus productos paso a paso.'
-                    : activeTab === 'one-click' ? 'Personaliza el botón de compra directa para aumentar conversiones.' : 'Gestiona los enlaces de descarga digital para tus productos físicos.'}
+                    : activeTab === 'one-click' ? 'Personaliza el botón de compra directa para aumentar conversiones.'
+                      : activeTab === 'thank-you' ? 'Personaliza la experiencia de entrega de tus productos digitales.'
+                        : 'Gestiona los enlaces de descarga digital para tus productos físicos.'}
                 </p>
               </div>
 
@@ -209,6 +212,8 @@ function App() {
               ) : (
                 <OneClickConfig product={products[0]} />
               )
+            ) : activeTab === 'thank-you' ? (
+              <ThankYouConfig />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {loading ? (

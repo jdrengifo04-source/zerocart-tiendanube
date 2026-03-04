@@ -28,6 +28,13 @@ export class TiendanubeService {
         return response.data;
     }
 
+    async getOrder(orderId: string) {
+        const response = await axios.get(`${TIENDANUBE_API_URL}/${this.storeId}/orders/${orderId}`, {
+            headers: this.getHeaders()
+        });
+        return response.data;
+    }
+
     async registerScript(src: string) {
         const response = await axios.post(`${TIENDANUBE_API_URL}/${this.storeId}/scripts`,
             {

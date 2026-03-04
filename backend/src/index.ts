@@ -10,6 +10,7 @@ import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProduc
 import { handleTiendanubeCallback } from './controllers/auth.controller.js';
 import { getStoreConfig, updateStoreConfig } from './controllers/config.controller.js';
 import { serveDynamicScript } from './controllers/script.controller.js';
+import { getOrderDetails } from './controllers/order.controller.js';
 import { authStore } from './middleware/authStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +36,9 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 
 // Endpoint para el script dinámico
 app.get('/api/scripts/buy-now.js', serveDynamicScript);
+
+// Endpoint para detalles de pedido (público para el script)
+app.get('/api/order/details', getOrderDetails);
 
 // Rutas de API
 app.get('/health', (req: Request, res: Response) => {

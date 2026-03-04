@@ -5,7 +5,8 @@ import {
     ChevronRight,
     Sun,
     Moon,
-    Zap
+    Zap,
+    CheckCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -47,7 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                         {[
                             { id: 'dashboard', label: 'Tutoriales', icon: LayoutDashboard },
                             { id: 'products', label: 'Productos', icon: Package },
-                            { id: 'one-click', label: '1 Click $', icon: Zap }
+                            { id: 'one-click', label: '1 Click $', icon: Zap },
+                            { id: 'thank-you', label: 'Página Gracias', icon: CheckCircle }
                         ].map((item) => (
                             <button
                                 key={item.id}

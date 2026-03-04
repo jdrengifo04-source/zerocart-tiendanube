@@ -21,6 +21,9 @@ export const getStoreConfig = async (req: Request, res: Response) => {
                 oneClickBgColor: true,
                 oneClickTextColor: true,
                 oneClickSize: true,
+                thankYouHeadline: true,
+                thankYouMessage: true,
+                thankYouShowImage: true,
             }
         });
 
@@ -49,7 +52,10 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
             oneClickText,
             oneClickBgColor,
             oneClickTextColor,
-            oneClickSize
+            oneClickSize,
+            thankYouHeadline,
+            thankYouMessage,
+            thankYouShowImage
         } = req.body;
 
         const updatedStore = await prisma.store.update({
@@ -59,7 +65,10 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
                 oneClickText,
                 oneClickBgColor,
                 oneClickTextColor,
-                oneClickSize
+                oneClickSize,
+                thankYouHeadline,
+                thankYouMessage,
+                thankYouShowImage
             },
             select: {
                 oneClickEnabled: true,
@@ -67,6 +76,9 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
                 oneClickBgColor: true,
                 oneClickTextColor: true,
                 oneClickSize: true,
+                thankYouHeadline: true,
+                thankYouMessage: true,
+                thankYouShowImage: true,
             }
         });
 
