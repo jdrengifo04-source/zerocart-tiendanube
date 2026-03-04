@@ -65,7 +65,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                 }
             }
             console.log('Configuración guardada correctamente');
-            alert('Configuración guardada y botón activado en tu tienda');
+            alert(isEnabled ? 'Configuración guardada y botón activado en tu tienda' : 'Configuración guardada y botón desactivado');
         } catch (error) {
             console.error('Error saving config', error);
             alert('Hubo un error al guardar la configuración');
@@ -190,7 +190,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                         </Card>
                     </div>
 
-                    <div className={`transition-all duration-500 flex justify-end ${isEnabled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                    <div className="flex justify-end pt-4">
                         <Button
                             onClick={handleSave}
                             disabled={isSaving}
