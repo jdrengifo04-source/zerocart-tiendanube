@@ -42,17 +42,41 @@ El proyecto es un monorepo simplificado:
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)
 
 
-## Tiendanube 1-Click Integration (Technical Guide)
+## 📘 Guía Técnica: Botón "1 Click" (Comprar Ahora) y Página de Gracias
 
-### Core Architecture
-1. **`loader.js`**: A static entry point that detects the `store_id` from global objects like `window.LS.store.id` or `window.TiendaNube.storeId`. It dynamically injects the real script from the backend.
-2. **Backend Serving**: The dynamic script is served at `/api/scripts/buy-now.js?store_id=...`, which fetches the store's customization from the database and replaces the "Add to Cart" button.
+Esta sección documenta cómo funciona exactamente la inyección del botón "Comprar Ahora" y la "Página de Gracias", para poder diagnosticar y reparar si en el futuro algo se rompe debido a cambios en los temas de Tiendanube.
 
-### Key Learnings
-- **Script Activation**: Use `onfirstinteraction` in the Tiendanube Partner Portal. `onload` can be blocked or execute too early.
-- **Robust Selectors**: Tiendanube themes vary. Always check for `.js-addtocart`, `.js-prod-submit-form`, and `#product_form`.
-- **Variant ID vs Product ID**: Some themes use `add_to_cart` as the product ID in their AJAX endpoints. Using `/comprar/` with `add_to_cart` is often more reliable than `/cart/add/` with `variant_id`.
-- **Checkout URL Construction**: Direct redirection to checkout possible by constructing `/checkout/v3/start/{cart_id}/{cart_token}` using values returned from the AJAX add-to-cart response.
+### 1. Arquitectura Central del Script Inyectado
+El sistema funciona a través de un script de inyección configurado en el Portal de Partners de Tiendanube:
+1. **Punto de Entrada**: La tienda carga un script estático o dinámico que nuestro backend provee a través del endpoint `/api/scripts/buy-now.js?store_id=XXXX`.
+2. **Contexto**: El script se ejecuta en el navegador del comprador final.
+3. **Restricción de Ambientes**: **Es crítico** que el script esté autorizado en el Portal de Partners para ejecutarse tanto en el entorno de la **Tienda (Storefront)** como en el **Checkout**, de lo contrario la página de gracias no funcionará.
+
+### 2. Flujo Completo: Botón "Comprar Ahora" (1 Click $)
+El objetivo es saltarse el carrito intermedio y enviar al cliente directo a pagar.
+
+- **Detección del Botón Original**: El script busca el botón de "Agregar al carrito" nativo usando selectores comunes (Ej. `.js-addtocart`, `.js-prod-submit-form`).
+- **Reemplazo Visual**: Oculta el botón nativo, oculta los selectores de cantidad (usando `.js-quantity`) e inyecta un nuevo botón `id="zerocart-buy-now"` estilizado con la configuración de la base de datos de la tienda.
+- **Acción (Click)**:
+  1. Extrae el `Product ID` y `Variant ID` de los `<input>` ocultos del formulario nativo de Tiendanube o del objeto global `window.LS.product.id`.
+  2. Realiza una petición `POST` AJAX en segundo plano hacia el endpoint relativo de la misma tienda: `/comprar/`. (Pasando el `add_to_cart=ID` y `quantity=1`).
+  3. Tiendanube responde con un JSON que contiene la información del carrito recién creado (`cart_id` y `cart_token`).
+  4. El script construye la URL de checkout directo: `/checkout/v3/start/{cart_id}/{cart_token}?from_store=1`.
+  5. Finalmente, redirige al usuario a esa URL, logrando el flujo de "Un solo clic".
+
+### 3. Flujo Completo: "Página de Gracias" (Entrega de PDF)
+El objetivo es entregar el link de descarga (Google Drive) justo cuando el cliente termina de pagar.
+
+- **Detección de Interfaz**: El script monitorea la URL. Si detecta `/checkout/v3/success/`, activa el flujo de entrega.
+- **Extracción de Orden**: Extrae el ID de la orden directamente de la URL (Ej. `/checkout/v3/success/1903742740/...`).
+- **Petición al Backend**: Envía una petición `GET` a nuestro backend (`/api/order/details?order_id=...&store_id=...`).
+- **Verificación en Servidor**: El backend (`order.controller.ts`) hace una petición a la API oficial de Tiendanube usando el Token de la tienda para verificar que el pedido realmente esté pago (Status: `paid` o `approved`).
+- **Respuesta y Renderizado**: Si el pedido es válido y pago, el backend devuelve la configuración de la tarjeta y los enlaces de descarga. El script inyecta un contenedor HTML (`id="zerocart-thank-you"`) al inicio de la página `.checkout-container` para mostrar el enlace de descarga directo.
+
+### 4. Key Learnings (Aprendizajes Clave)
+- **Script Activation**: En el Portal de Partners, para inyectar scripts, usa el evento `onfirstinteraction`. El evento `onload` puede ser bloqueado o ejecutarse demasiado temprano en algunos temas.
+- **Robust Selectors**: Los temas de Tiendanube varían mucho. Siempre busca por `.js-addtocart`, `.js-prod-submit-form` y selecciona el formulario padre más cercano para extraer la "Variante".
+- **Comprar vs Cart Add**: Algunos temas usan directamente el `product_id` en `add_to_cart`. Usar el endpoint `/comprar/` con variables AJAX es mucho más estable que intentar enviar formularios estándar (que llevan al carrito).
 
 ### PowerShell Compatibility (Critical)
 - **Windows PowerShell 5.1**: Does NOT support `&&` for chaining commands. 
