@@ -17,6 +17,7 @@ interface Product {
   id: number;
   name: string;
   price: string;
+  promotional_price?: string | null;
   image: string | null;
   googleDriveLink: string;
 }

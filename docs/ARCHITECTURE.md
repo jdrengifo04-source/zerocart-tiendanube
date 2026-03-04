@@ -8,10 +8,12 @@ La aplicación inyecta un script en la tienda del cliente mediante la API de `/s
 - **Comportamiento**: Redirige al usuario a un checkout personalizado o modifica el comportamiento estándar para asegurar que el proceso pase por Zerocart para el cobro de comisiones.
 
 ### 2. Panel de Administración (Frontend)
-El dueño de la tienda accede a `zerocart.jrengifo.com` para:
-- Visualizar sus productos de Tiendanube.
-- Asignar un enlace de Google Drive (o similar) a cada producto.
-- Guardar esta configuración en la base de datos de Zerocart.
+El dueño de la tienda accede a `zerocart.jrengifo.com` para configurar su experiencia y sus productos. La arquitectura Frontend está modularizada en:
+- **Vista de Productos**: Permite visualizar sus productos de Tiendanube (con precios reales extraídos de la API) y asignar un enlace de Google Drive a cada uno.
+- **Configuración "1 Click $"**: Interfaz donde el usuario puede personalizar colores, texto y tamaño del botón de compra directa que se inyectará en su tienda. Incluye una previsualización dinámica.
+- **Dashboard/Tutoriales**: Área de onboarding y guía de uso.
+
+Estas configuraciones se guardan en la base de datos de Zerocart a través del backend.
 
 ### 3. Procesamiento de Pagos (Webhooks)
 Cuando se realiza un pago en la tienda:

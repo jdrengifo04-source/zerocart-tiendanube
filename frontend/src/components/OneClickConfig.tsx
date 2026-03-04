@@ -6,6 +6,7 @@ interface Product {
     id: number;
     name: string;
     price: string;
+    promotional_price?: string | null;
     image: string | null;
     googleDriveLink: string;
 }
@@ -194,11 +195,13 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
 
                                         <div className="flex items-center gap-3 mb-5">
                                             <span className="text-2xl font-black text-slate-900 dark:text-white">
-                                                $ {product?.price || '299.00'}
+                                                $ {product?.promotional_price || product?.price || '299.00'}
                                             </span>
-                                            <span className="text-sm line-through text-slate-400 dark:text-slate-500">
-                                                $ {product ? (parseFloat(product.price) * 1.2).toFixed(2) : '359.00'}
-                                            </span>
+                                            {(product?.promotional_price || (!product?.price && !product?.promotional_price)) && (
+                                                <span className="text-sm line-through text-slate-400 dark:text-slate-500">
+                                                    $ {product?.price || '359.00'}
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div className="text-xs text-emerald-600 dark:text-emerald-400 mb-6 flex items-center gap-1.5 font-bold bg-emerald-50 dark:bg-emerald-500/10 w-fit px-2.5 py-1 rounded">

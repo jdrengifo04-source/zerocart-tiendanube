@@ -6,6 +6,7 @@ interface Product {
     id: number;
     name: string;
     price: string;
+    promotional_price?: string | null;
     image: string | null;
     googleDriveLink: string;
 }
@@ -49,7 +50,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, saving, onLinkChange
                         <h3 className="text-sm font-sora font-extrabold text-slate-900 dark:text-white truncate mb-1 leading-tight group-hover:text-primary transition-colors">
                             {product.name}
                         </h3>
-                        <p className="text-sm font-black text-primary">$ {product.price}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-black text-primary">$ {product.promotional_price || product.price}</p>
+                            {product.promotional_price && (
+                                <p className="text-[11px] font-bold text-slate-400 line-through decoration-slate-300 dark:decoration-slate-600">$ {product.price}</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 

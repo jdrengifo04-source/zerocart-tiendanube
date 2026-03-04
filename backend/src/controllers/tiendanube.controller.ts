@@ -25,11 +25,14 @@ export const getProducts = async (req: Request, res: Response) => {
         // Combinar datos
         const productsWithLinks = tnProducts.map((p: any) => {
             const dbProduct = dbProducts.find((dp: any) => dp.id === p.id.toString());
+            const firstVariant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
             return {
                 ...p,
                 name: p.name.es || Object.values(p.name)[0], // Normalizar el nombre aquí también por si acaso
                 image: p.images && p.images.length > 0 ? p.images[0].src : null,
-                googleDriveLink: dbProduct?.googleDriveLink || ''
+                googleDriveLink: dbProduct?.googleDriveLink || '',
+                price: firstVariant ? firstVariant.price : '0.00',
+                promotional_price: firstVariant ? firstVariant.promotional_price || firstVariant.compare_at_price : null
             };
         });
 

@@ -24,7 +24,10 @@ El proyecto es un monorepo simplificado:
 ## 📍 Estado Actual (Marzo 2026)
 - ✅ Infraestructura de despliegue configurada y funcional.
 - ✅ Frontend servido exitosamente por el backend en producción.
-- ✅ Integración básica con Tiendanube para listar productos.
+- ✅ Refactorización Monolítica Completada: UI modular (Sidebar, ProductCard, OneClickConfig).
+- ✅ Integración con Tiendanube consolidada:
+  - Extracción de `price` y `promotional_price` desde `variants`.
+- ✅ Implementación visual "1 Click $": Vista Previa Móvil dinámica usando datos reales de la tienda.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
 
