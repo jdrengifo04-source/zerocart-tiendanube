@@ -3,6 +3,9 @@ import { TiendanubeService } from '../services/tiendanube.service.js';
 import prisma from '../lib/prisma.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { EmailService } from '../services/email.service.js';
+
+const emailService = new EmailService();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,20 +114,68 @@ export const handleOrderPaidWebhook = async (req: Request, res: Response) => {
             const accessToken = store?.accessToken || process.env.TEST_ACCESS_TOKEN || '';
             const tnService = new TiendanubeService(storeId.toString(), accessToken);
 
-            const description = `Zerocart Fee - Pedido #${orderData.id}`;
-            const amount = 0.15;
-            const currency = orderData.main_currency || 'USD';
+            // ==========================================
+            // 1. Cobro de Comisión (Si Aplica)
+            // ==========================================
+            try {
+                const description = `Zerocart Fee - Pedido #${orderData.id}`;
+                const amount = 0.15;
+                const currency = orderData.main_currency || 'USD';
 
-            console.log(`💸 Intentando cobrar ${amount} ${currency} por comisión de Zerocart...`);
-            const chargeResult = await tnService.createCharge(description, amount, currency);
+                console.log(`💸 Intentando cobrar ${amount} ${currency} por comisión de Zerocart...`);
+                const chargeResult = await tnService.createCharge(description, amount, currency);
+                console.log('✅ Cobro registrado en Tiendanube:', chargeResult.id);
+            } catch (feeError: any) {
+                console.error('⚠️ Fallo al cobrar fee, continuando de igual manera:', feeError.message);
+            }
 
-            console.log('✅ Cobro registrado en Tiendanube:', chargeResult.id);
-            res.json({ message: 'Cobro realizado', charge_id: chargeResult.id });
+            // ==========================================
+            // 2. Entrega Automática de Productos Digitales
+            // ==========================================
+            try {
+                const productIds = orderData.products?.map((p: any) => p.product_id?.toString()) || [];
+
+                if (productIds.length > 0) {
+                    const dbProducts = await prisma.product.findMany({
+                        where: { id: { in: productIds }, storeId: storeId.toString() }
+                    });
+
+                    // Match productos comprados con los que tienen link en la base de datos
+                    const digitalProducts = orderData.products.map((p: any) => {
+                        const dbProduct = dbProducts.find(dp => dp.id === p.product_id?.toString());
+                        return {
+                            name: p.name?.es || (p.name ? Object.values(p.name)[0] : 'Producto Digital'),
+                            image: p.image?.src || null,
+                            googleDriveLink: dbProduct?.googleDriveLink || null
+                        };
+                    }).filter((p: any) => p.googleDriveLink !== null);
+
+                    const customerEmail = orderData.customer?.email;
+
+                    if (digitalProducts.length > 0 && customerEmail) {
+                        console.log(`🚀 Iniciando entrega digital de ${digitalProducts.length} productos para ${customerEmail}`);
+                        await emailService.initTestAccountIfNeeded();
+                        await emailService.sendDigitalDeliveryEmail(
+                            customerEmail,
+                            orderData.customer?.name || 'Cliente',
+                            store?.thankYouHeadline || '¡Gracias por tu compra!',
+                            store?.thankYouMessage || 'Aquí están los enlaces para descargar tus productos digitales.',
+                            digitalProducts
+                        );
+                    } else {
+                        console.log(`ℹ️ Pedido #${orderData.id} no contiene productos digitales o no se encontró el email.`);
+                    }
+                }
+            } catch (deliveryError: any) {
+                console.error('❌ Error en el proceso de entrega digital:', deliveryError);
+            }
+
+            res.json({ message: 'Webhook procesado' });
         } else {
             res.status(200).json({ message: 'Ignorado (no pago o store_id faltante)' });
         }
     } catch (error: any) {
-        console.error('❌ Error facturación:', error.response?.data || error.message);
-        res.status(200).json({ error: 'Fallo al procesar cobro' });
+        console.error('❌ Error general en Webhook:', error.response?.data || error.message);
+        res.status(200).json({ error: 'Fallo al procesar webhook' });
     }
 };
