@@ -54,8 +54,10 @@ El proyecto es un monorepo simplificado:
 - **Variant ID vs Product ID**: Some themes use `add_to_cart` as the product ID in their AJAX endpoints. Using `/comprar/` with `add_to_cart` is often more reliable than `/cart/add/` with `variant_id`.
 - **Checkout URL Construction**: Direct redirection to checkout possible by constructing `/checkout/v3/start/{cart_id}/{cart_token}` using values returned from the AJAX add-to-cart response.
 
-### Manual Actions Required
-- Scripts MUST be registered manually in the Partner Portal initially (Script ID: #5084). API-based injection is currently unreliable without pre-authorized IDs.
+### PowerShell Compatibility (Critical)
+- **Windows PowerShell 5.1**: Does NOT support `&&` for chaining commands. 
+- **Recommendation**: Run `git` commands sequentially or use `;` (e.g., `git add . ; git commit -m '...' ; git push`). 
+- Avoid `&&` to prevent `ParserError: (:)` errors in the model's environment.
 
 ---
 *Nota: Este archivo debe mantenerse actualizado por cada agente que realice cambios significativos en la estructura o el flujo principal.*
