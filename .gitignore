@@ -41,6 +41,6 @@ yarn-error.log*
 # Project specific
 tmp/
 artifacts/
-*.png
-*.jpg
-*.jpeg
+#*.png
+#*.jpg
+#*.jpeg
