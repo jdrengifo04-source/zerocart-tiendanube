@@ -39,5 +39,21 @@ El proyecto es un monorepo simplificado:
 - [Guía de Despliegue y Ops](docs/DEPLOYMENT.md)
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)
 
+
+## Tiendanube 1-Click Integration (Technical Guide)
+
+### Core Architecture
+1. **`loader.js`**: A static entry point that detects the `store_id` from global objects like `window.LS.store.id` or `window.TiendaNube.storeId`. It dynamically injects the real script from the backend.
+2. **Backend Serving**: The dynamic script is served at `/api/scripts/buy-now.js?store_id=...`, which fetches the store's customization from the database and replaces the "Add to Cart" button.
+
+### Key Learnings
+- **Script Activation**: Use `onfirstinteraction` in the Tiendanube Partner Portal. `onload` can be blocked or execute too early.
+- **Robust Selectors**: Tiendanube themes vary. Always check for `.js-addtocart`, `.js-prod-submit-form`, and `#product_form`.
+- **Variant ID Extraction**: If `input[name="variant_id"]` is missing, check `window.LS.variants`.
+- **Checkout URL**: The `/checkout` URL can vary by country or theme. Always verify if the store uses `/checkout/v3/start/` (e.g., in some Argentina-based themes) or just `/checkout/`.
+
+### Manual Actions Required
+- Scripts MUST be registered manually in the Partner Portal initially (Script ID: #5084). API-based injection is currently unreliable without pre-authorized IDs.
+
 ---
 *Nota: Este archivo debe mantenerse actualizado por cada agente que realice cambios significativos en la estructura o el flujo principal.*
