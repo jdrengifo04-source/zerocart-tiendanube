@@ -72,7 +72,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         // Ocultar selector de cantidad (solo el elemento para no romper el grid)
         for (const qSelector of QUANTITY_SELECTORS) {
-            const qElem = document.querySelector(qSelector) as HTMLElement;
+            const qElem = document.querySelector(qSelector);
             if (qElem) {
                 console.log('✅ Zerocart: Selector de cantidad oculto:', qSelector);
                 qElem.style.display = 'none';
