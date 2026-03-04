@@ -70,56 +70,79 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         addToCartBtn.style.display = 'none';
 
-        // Ocultar selector de cantidad si existe
+        // Ocultar selector de cantidad y sus contenedores de columna para evitar espacios vacíos
         for (const qSelector of QUANTITY_SELECTORS) {
             const qElem = document.querySelector(qSelector);
             if (qElem) {
                 console.log('✅ Zerocart: Selector de cantidad oculto:', qSelector);
                 qElem.style.display = 'none';
+                
+                // Intentar ocultar el contenedor de columna (ej. col-4) si existe para recuperar el espacio
+                const parentCol = qElem.closest('.col-4, .col-md-3, .col-sm-4, .col-xs-4');
+                if (parentCol) {
+                    parentCol.style.display = 'none';
+                    console.log('✅ Zerocart: Contenedor de columna oculto');
+                }
             }
         }
 
+        // Inyectar estilos para el botón y su contenedor
+        const style = document.createElement('style');
+        style.innerHTML = `
+        #zerocart - container {
+            display: flex;
+            width: 100 %;
+            margin: 20px 0;
+        }
+        #zerocart - buy - now {
+            width: 100 %;
+            padding: 18px 30px;
+            font - size: 18px;
+            font - weight: bold;
+            border: none;
+            border - radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            display: flex;
+            align - items: center;
+            justify - content: center;
+            gap: 10px;
+            box - shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text - transform: uppercase;
+            background - color: ${ store.oneClickBgColor || '#007bff' };
+            color: ${ store.oneClickTextColor || '#ffffff' };
+        }
+        #zerocart - buy - now:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        @media(min - width: 768px) {
+            #zerocart - container {
+                justify - content: flex - start;
+            }
+            #zerocart - buy - now {
+                width: auto;
+                min - width: 350px;
+            }
+        }
+        @media(max - width: 767px) {
+            #zerocart - container {
+                justify - content: center;
+            }
+        }
+        `;
+        document.head.appendChild(style);
+
+        const container = document.createElement('div');
+        container.id = 'zerocart-container';
+
         const buyNowBtn = document.createElement('button');
         buyNowBtn.id = 'zerocart-buy-now';
-        buyNowBtn.innerHTML = '⚡ ${store.oneClickText}';
+        buyNowBtn.innerHTML = '⚡ ' + '${store.oneClickText}';
         buyNowBtn.type = 'button';
 
-        // Ancho según configuración
-        let buttonWidth = 'auto';
-        if ('${store.oneClickSize}' === 'grande') {
-            buttonWidth = '80%';
-        } else if ('${store.oneClickSize}' === 'completo') {
-            buttonWidth = '100%';
-        } else {
-            buttonWidth = '100%'; // Default for normal for now, usually buttons are full width on mobile
-        }
-
-        Object.assign(buyNowBtn.style, {
-            backgroundColor: '${store.oneClickBgColor}',
-            color: '${store.oneClickTextColor}',
-            padding: '${store.oneClickSize === "normal" ? "12px 24px" : "16px 32px"}',
-            fontSize: '${store.oneClickSize === "grande" || store.oneClickSize === "completo" ? "20px" : "16px"}',
-            fontWeight: 'bold',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            width: buttonWidth,
-            marginTop: '10px',
-            transition: 'all 0.3s ease',
-            textTransform: 'uppercase'
-        });
-
-        buyNowBtn.onmouseover = () => {
-            buyNowBtn.style.opacity = '0.9';
-            buyNowBtn.style.transform = 'translateY(-2px)';
-        };
-
-        buyNowBtn.onmouseout = () => {
-            buyNowBtn.style.opacity = '1';
-            buyNowBtn.style.transform = 'translateY(0)';
-        };
-
-        addToCartBtn.parentNode.insertBefore(buyNowBtn, addToCartBtn.nextSibling);
+        container.appendChild(buyNowBtn);
+        addToCartBtn.parentNode.insertBefore(container, addToCartBtn.nextSibling);
 
         buyNowBtn.onclick = async function (e) {
             e.preventDefault();
