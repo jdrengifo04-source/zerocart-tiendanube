@@ -1,0 +1,1 @@
+console.log("🚀 Zerocart: Función 1 Click $ deshabilitada para esta tienda.");

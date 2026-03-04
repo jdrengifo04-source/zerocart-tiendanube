@@ -333,15 +333,16 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         let productsHtml = '';
         data.products.forEach(p => {
-            productsHtml += \\\`
+            const imgHtml = (data.config.showImage && p.image) ? \`<img src="\${p.image}" class="zerocart-item-img" />\` : '';
+            productsHtml += \`
                 <div class="zerocart-item-row">
-                    \\\${data.config.showImage && p.image ? \\\`<img src="\\\${p.image}" class="zerocart-item-img" />\\\` : ''}
+                    \${imgHtml}
                     <div class="zerocart-item-info">
-                        <span class="zerocart-item-name">\\\${p.name}</span>
-                        <a href="\\\${p.googleDriveLink}" target="_blank" class="zerocart-item-btn">📥 DESCARGAR AHORA</a>
+                        <span class="zerocart-item-name">\${p.name}</span>
+                        <a href="\${p.googleDriveLink}" target="_blank" class="zerocart-item-btn">📥 DESCARGAR AHORA</a>
                     </div>
                 </div>
-            \\\`;
+            \`;
         });
 
         card.innerHTML = \`
