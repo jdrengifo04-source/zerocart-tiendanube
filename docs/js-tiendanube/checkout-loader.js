@@ -56,7 +56,7 @@
         }
 
         var s = document.createElement('script');
-        s.src = 'https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=' + storeId;
+        s.src = 'https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=' + storeId + '&v=' + new Date().getTime();
         s.async = true;
         s.onload = function () {
             console.log('✅ Zerocart: Script de inyección buy-now.js cargado correctamente.');
