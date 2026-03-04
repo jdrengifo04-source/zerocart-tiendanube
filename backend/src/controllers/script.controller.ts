@@ -70,19 +70,12 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         addToCartBtn.style.display = 'none';
 
-        // Ocultar selector de cantidad y sus contenedores de columna para evitar espacios vacíos
+        // Ocultar selector de cantidad (solo el elemento para no romper el grid)
         for (const qSelector of QUANTITY_SELECTORS) {
-            const qElem = document.querySelector(qSelector);
+            const qElem = document.querySelector(qSelector) as HTMLElement;
             if (qElem) {
                 console.log('✅ Zerocart: Selector de cantidad oculto:', qSelector);
                 qElem.style.display = 'none';
-                
-                // Intentar ocultar el contenedor de columna (ej. col-4) si existe para recuperar el espacio
-                const parentCol = qElem.closest('.col-4, .col-md-3, .col-sm-4, .col-xs-4');
-                if (parentCol) {
-                    parentCol.style.display = 'none';
-                    console.log('✅ Zerocart: Contenedor de columna oculto');
-                }
             }
         }
 
@@ -93,6 +86,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                 display: flex;
                 width: 100%;
                 margin: 20px 0;
+                clear: both;
             }
             #zerocart-buy-now {
                 width: 100%;
@@ -142,7 +136,11 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         buyNowBtn.type = 'button';
 
         container.appendChild(buyNowBtn);
-        addToCartBtn.parentNode.insertBefore(container, addToCartBtn.nextSibling);
+        
+        // Insertar el contenedor después de la columna de añadir al carrito o en el formulario
+        // Buscamos un contenedor más amplio para que el width: 100% funcione mejor
+        const mainContainer = addToCartBtn.closest('form') || addToCartBtn.parentNode;
+        mainContainer.appendChild(container);
 
         buyNowBtn.onclick = async function (e) {
             e.preventDefault();
