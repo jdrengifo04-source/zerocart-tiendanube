@@ -3,7 +3,20 @@ import axios from 'axios';
 import { Card, Button, Input } from 'speed-code';
 import { ToggleLeft, ToggleRight, Check, CheckCircle, ImageIcon, Loader2, Type, AlignLeft } from 'lucide-react';
 
-const ThankYouConfig: React.FC = () => {
+interface Product {
+    id: number;
+    name: string;
+    price: string;
+    promotional_price?: string | null;
+    image: string | null;
+    googleDriveLink: string;
+}
+
+interface ThankYouConfigProps {
+    product?: Product;
+}
+
+const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
     const [headline, setHeadline] = useState('¡Tu descarga está lista!');
     const [message, setMessage] = useState('Gracias por tu compra. Aquí tienes los enlaces de tus productos digitales.');
     const [showImage, setShowImage] = useState(true);
@@ -144,15 +157,26 @@ const ThankYouConfig: React.FC = () => {
                                 <div className="space-y-4">
                                     <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl flex items-center gap-4">
                                         {showImage && (
-                                            <div className="w-12 h-12 bg-slate-200 dark:bg-white/10 rounded-lg shrink-0 flex items-center justify-center">
-                                                <ImageIcon size={20} className="text-slate-400" />
+                                            <div className="w-12 h-12 bg-slate-200 dark:bg-white/10 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
+                                                {product?.image ? (
+                                                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <ImageIcon size={20} className="text-slate-400" />
+                                                )}
                                             </div>
                                         )}
                                         <div className="flex-1 overflow-hidden">
-                                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate mb-1">Nombre del Producto Digital</div>
-                                            <div className="inline-block px-3 py-1.5 bg-primary text-white text-[10px] font-black rounded-lg uppercase tracking-wider">
-                                                Descargar Ahora
+                                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate mb-1">
+                                                {product?.name || 'Nombre del Producto Digital'}
                                             </div>
+                                            <a
+                                                href={product?.googleDriveLink || '#'}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-block px-3 py-1.5 bg-primary text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:bg-primary/90 transition-colors cursor-pointer no-underline"
+                                            >
+                                                Descargar Ahora
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

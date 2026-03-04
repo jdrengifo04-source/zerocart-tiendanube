@@ -213,7 +213,7 @@ function App() {
                 <OneClickConfig product={products[0]} />
               )
             ) : activeTab === 'thank-you' ? (
-              <ThankYouConfig />
+              <ThankYouConfig product={products[0]} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {loading ? (
