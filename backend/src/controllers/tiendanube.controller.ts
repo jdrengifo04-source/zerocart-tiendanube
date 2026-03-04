@@ -38,8 +38,18 @@ export const getProducts = async (req: Request, res: Response) => {
 
         res.json(productsWithLinks);
     } catch (error: any) {
-        console.error('Error obteniendo productos:', error.response?.data || error.message);
-        res.status(500).json({ error: 'No se pudieron obtener los productos' });
+        const statusCode = error.response?.status || 500;
+        const errorMessage = error.response?.data?.error || error.message;
+
+        console.error('Error obteniendo productos:', errorMessage);
+
+        if (statusCode === 401) {
+            return res.status(401).json({
+                error: 'Token de Tiendanube expirado o inválido. Por favor, vuelve a entrar desde el panel de Tiendanube.'
+            });
+        }
+
+        res.status(statusCode).json({ error: 'No se pudieron obtener los productos' });
     }
 };
 

@@ -29,6 +29,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -69,10 +70,13 @@ function App() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await axios.get('/api/products');
       setProducts(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading products:', error);
+      const msg = error.response?.data?.error || 'Error al conectar con el servidor';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -220,6 +224,23 @@ function App() {
                   Array(6).fill(0).map((_, i) => (
                     <div key={i} className="h-80 rounded-3xl bg-slate-100 dark:bg-white/5 animate-pulse" />
                   ))
+                ) : error ? (
+                  <div className="col-span-full py-20 text-center animate-in fade-in duration-500">
+                    <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 text-red-500 shadow-sm border border-red-100 dark:border-red-500/20">
+                      <RefreshCw size={36} className="animate-spin-slow" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Error de Conexión</h3>
+                    <p className="max-w-md mx-auto text-slate-500 dark:text-slate-400 font-medium px-4">
+                      {error}
+                    </p>
+                    <Button
+                      variant="primary"
+                      onClick={fetchProducts}
+                      className="mt-8 rounded-full px-8"
+                    >
+                      Intentar de nuevo
+                    </Button>
+                  </div>
                 ) : filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
                     <ProductCard
