@@ -55,17 +55,28 @@
             console.log('✅ Zerocart: Store ID detectado exitosamente en Checkout:', storeId);
         }
 
-        var s = document.createElement('script');
-        s.src = 'https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=' + storeId + '&v=' + new Date().getTime();
-        s.async = true;
-        s.onload = function () {
-            console.log('✅ Zerocart: Script de inyección buy-now.js cargado correctamente.');
+        var scriptUrl = 'https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=' + storeId + '&v=' + new Date().getTime();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', scriptUrl, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    console.log('✅ Zerocart: Script buy-now.js descargado vía XHR.');
+                    var s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    s.text = xhr.responseText;
+                    document.documentElement.appendChild(s);
+                    console.log('📦 Zerocart: Etiqueta <script> ejecutada en el DOM (XHR).');
+                } else {
+                    console.warn('❌ Zerocart: Error al cargar buy-now.js HTTP ' + xhr.status);
+                }
+            }
         };
-        s.onerror = function () {
-            console.error('❌ Zerocart: Error al cargar buy-now.js desde el servidor.');
+        xhr.onerror = function () {
+            console.warn('❌ Zerocart: Error de red al cargar buy-now.js vía XHR.');
         };
-        document.head.appendChild(s);
-        console.log('📦 Zerocart: Etiqueta <script> insertada en el DOM.');
+        xhr.send();
     } catch (e) {
         console.error('❌ Zerocart Debug: Error global en el loader:', e);
     }
