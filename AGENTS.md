@@ -29,6 +29,7 @@ El proyecto es un monorepo simplificado:
   - Extracción de `price` y `promotional_price` desde `variants`.
 - ✅ Implementación visual "1 Click $": Vista Previa Móvil dinámica usando datos reales de la tienda.
 - ✅ Integración DB/API "1 Click $": Configuración guardada en PostgreSQL vía Prisma. Función de autoinyección del Script dinámico vía API de Tiendanube.
+- ✅ Redirección Directa a Checkout: Solucionado el error de carrito vacío mediante flujo AJAX al endpoint `/comprar/`, permitiendo redirección directa a la URL final de pago (`/checkout/v3/start/...`).
 - ✅ Permisos de Tiendanube configurados: Identificados y habilitados los alcances necesarios (Products, Scripts, Orders, Customers) para la próxima fase de Página de Gracias y Descarga de PDFs.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
 - 🔄 (Pendiente) Desarrollo de flujo "Página de Gracias" para entrega de PDFs vinculado al webhook de Orders.
@@ -49,8 +50,8 @@ El proyecto es un monorepo simplificado:
 ### Key Learnings
 - **Script Activation**: Use `onfirstinteraction` in the Tiendanube Partner Portal. `onload` can be blocked or execute too early.
 - **Robust Selectors**: Tiendanube themes vary. Always check for `.js-addtocart`, `.js-prod-submit-form`, and `#product_form`.
-- **Variant ID Extraction**: If `input[name="variant_id"]` is missing, check `window.LS.variants`.
-- **Checkout URL**: The `/checkout` URL can vary by country or theme. Always verify if the store uses `/checkout/v3/start/` (e.g., in some Argentina-based themes) or just `/checkout/`.
+- **Variant ID vs Product ID**: Some themes use `add_to_cart` as the product ID in their AJAX endpoints. Using `/comprar/` with `add_to_cart` is often more reliable than `/cart/add/` with `variant_id`.
+- **Checkout URL Construction**: Direct redirection to checkout possible by constructing `/checkout/v3/start/{cart_id}/{cart_token}` using values returned from the AJAX add-to-cart response.
 
 ### Manual Actions Required
 - Scripts MUST be registered manually in the Partner Portal initially (Script ID: #5084). API-based injection is currently unreliable without pre-authorized IDs.

@@ -110,57 +110,71 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             buyNowBtn.innerHTML = 'Procesando...';
             buyNowBtn.disabled = true;
 
+            let productId = null;
             let variantId = null;
             const form = addToCartBtn.closest('form');
+            
             if (form) {
                 const variantInput = form.querySelector('input[name="variant_id"]');
                 const addToCartInput = form.querySelector('input[name="add_to_cart"]');
                 
+                if (addToCartInput && addToCartInput.value) {
+                    productId = addToCartInput.value;
+                }
                 if (variantInput && variantInput.value) {
                     variantId = variantInput.value;
-                } else if (addToCartInput && addToCartInput.value) {
-                    // A veces add_to_cart es el Product ID, necesitamos el Variant ID
-                    if (window.LS && window.LS.variants && window.LS.variants.length > 0) {
-                        variantId = window.LS.variants[0].id;
-                    } else {
-                        variantId = addToCartInput.value;
-                    }
                 }
             }
 
-            // Fallback final: si todavía no hay ID, probar con el primer variant de LS
-            if (!variantId && window.LS && window.LS.variants && window.LS.variants.length > 0) {
-                variantId = window.LS.variants[0].id;
+            // Fallback para Product ID desde LS si no está en el form
+            if (!productId && window.LS && window.LS.product) {
+                productId = window.LS.product.id;
             }
 
-            if (!variantId) {
-                console.error('❌ Zerocart: No se pudo identificar el Variant ID.');
+            if (!productId) {
+                console.error('❌ Zerocart: No se pudo identificar el Product ID.');
                 alert('Lo sentimos, intenta con el botón normal.');
                 addToCartBtn.style.display = 'block';
                 buyNowBtn.remove();
                 return;
             }
 
-            console.log('🚀 Zerocart: Iniciando compra para Variant ID:', variantId);
+            console.log('🚀 Zerocart: Iniciando compra para Product ID:', productId);
 
             try {
-                const response = await fetch('/cart/add/', {
+                // Usamos /comprar/ porque es el endpoint que maneja la lógica de carrito en muchos temas
+                const response = await fetch('/comprar/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: new URLSearchParams({
-                        'variant_id': variantId,
+                        'add_to_cart': productId,
                         'quantity': '1'
                     })
                 });
 
                 if (response.ok) {
-                    console.log('✅ Zerocart: Producto agregado. Redirigiendo...');
-                    // Intentar usar URLs dinámicas de Tiendanube locales
-                    const checkoutUrl = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
-                    window.location.href = checkoutUrl;
+                    const data = await response.json();
+                    console.log('✅ Zerocart: Respuesta recibida:', data);
+
+                    if (data.success && data.cart) {
+                        const cartId = data.cart.id;
+                        const cartToken = data.cart.token;
+                        // Construimos la URL de checkout directo usando concatenación para evitar problemas con backticks
+                        const checkoutUrl = '/checkout/v3/start/' + cartId + '/' + cartToken + '?from_store=1';
+                        console.log('🔗 Zerocart: Redirigiendo a checkout:', checkoutUrl);
+                        window.location.href = checkoutUrl;
+                    } else if (data.cart && data.cart.abandoned_checkout_url) {
+                        // Fallback a la URL de checkout abandonado si existe
+                        console.log('🔗 Zerocart: Redirigiendo a abandoned_checkout_url');
+                        window.location.href = data.cart.abandoned_checkout_url;
+                    } else {
+                        // Último recurso: URL de carrito normal
+                        console.log('🔗 Zerocart: Redirigiendo a cartUrl fallback');
+                        window.location.href = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
+                    }
                 } else {
                     throw new Error('Fallo en la API de Tiendanube');
                 }
@@ -178,7 +192,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         initBuyNow();
     }
 })();
-        `;
+`;
 
         res.type('application/javascript').send(scriptContent);
     } catch (error) {
