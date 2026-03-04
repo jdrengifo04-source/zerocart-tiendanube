@@ -88,49 +88,49 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         // Inyectar estilos para el botón y su contenedor
         const style = document.createElement('style');
-        style.innerHTML = `
-        #zerocart - container {
-            display: flex;
-            width: 100 %;
-            margin: 20px 0;
-        }
-        #zerocart - buy - now {
-            width: 100 %;
-            padding: 18px 30px;
-            font - size: 18px;
-            font - weight: bold;
-            border: none;
-            border - radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            display: flex;
-            align - items: center;
-            justify - content: center;
-            gap: 10px;
-            box - shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text - transform: uppercase;
-            background - color: ${ store.oneClickBgColor || '#007bff' };
-            color: ${ store.oneClickTextColor || '#ffffff' };
-        }
-        #zerocart - buy - now:hover {
-            transform: translateY(-2px);
-            opacity: 0.9;
-        }
-        @media(min - width: 768px) {
-            #zerocart - container {
-                justify - content: flex - start;
+        style.innerHTML = \`
+            #zerocart-container {
+                display: flex;
+                width: 100%;
+                margin: 20px 0;
             }
-            #zerocart - buy - now {
-                width: auto;
-                min - width: 350px;
+            #zerocart-buy-now {
+                width: 100%;
+                padding: 18px 30px;
+                font-size: 18px;
+                font-weight: bold;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: transform 0.2s, opacity 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                text-transform: uppercase;
+                background-color: ${store.oneClickBgColor || '#007bff'};
+                color: ${store.oneClickTextColor || '#ffffff'};
             }
-        }
-        @media(max - width: 767px) {
-            #zerocart - container {
-                justify - content: center;
+            #zerocart-buy-now:hover {
+                transform: translateY(-2px);
+                opacity: 0.9;
             }
-        }
-        `;
+            @media (min-width: 768px) {
+                #zerocart-container {
+                    justify-content: flex-start;
+                }
+                #zerocart-buy-now {
+                    width: auto;
+                    min-width: 350px;
+                }
+            }
+            @media (max-width: 767px) {
+                #zerocart-container {
+                    justify-content: center;
+                }
+            }
+        \`;
         document.head.appendChild(style);
 
         const container = document.createElement('div');
@@ -138,7 +138,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         const buyNowBtn = document.createElement('button');
         buyNowBtn.id = 'zerocart-buy-now';
-        buyNowBtn.innerHTML = '⚡ ' + '${store.oneClickText}';
+        buyNowBtn.innerHTML = '⚡ ${store.oneClickText || 'Comprar Ahora'}';
         buyNowBtn.type = 'button';
 
         container.appendChild(buyNowBtn);
