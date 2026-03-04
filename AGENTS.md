@@ -37,6 +37,7 @@ El proyecto es un monorepo simplificado:
 
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)
+- [Solución Redirección One-Click](docs/ONE_CLICK_CHECKOUT.md)
 - [Guía de Despliegue y Ops](docs/DEPLOYMENT.md)
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)
 

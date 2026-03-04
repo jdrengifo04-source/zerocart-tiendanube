@@ -41,6 +41,13 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         '[data-store="product-buy-button"]'
     ];
 
+    const QUANTITY_SELECTORS = [
+        '.js-quantity',
+        '.form-group.js-quantity',
+        '.form-quantity',
+        '[data-component="product.quantity"]'
+    ];
+
     function initBuyNow() {
         console.log('🔍 Zerocart: Buscando botón de compra...');
         let addToCartBtn = null;
@@ -62,6 +69,15 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         if (document.getElementById('zerocart-buy-now')) return;
 
         addToCartBtn.style.display = 'none';
+
+        // Ocultar selector de cantidad si existe
+        for (const qSelector of QUANTITY_SELECTORS) {
+            const qElem = document.querySelector(qSelector);
+            if (qElem) {
+                console.log('✅ Zerocart: Selector de cantidad oculto:', qSelector);
+                qElem.style.display = 'none';
+            }
+        }
 
         const buyNowBtn = document.createElement('button');
         buyNowBtn.id = 'zerocart-buy-now';
