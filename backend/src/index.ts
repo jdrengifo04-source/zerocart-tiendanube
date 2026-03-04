@@ -33,6 +33,9 @@ app.use(morgan('dev'));
 // 1. SERVIR SCRIPTS INYECTABLES
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
+// Endpoint para el script dinámico
+app.get('/api/scripts/buy-now.js', serveDynamicScript);
+
 // Rutas de API
 app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'Zerocart Backend is running', timestamp: new Date() });
