@@ -33,30 +33,38 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
     const ADD_TO_CART_SELECTORS = [
         '.js-addtocart',
-        '.js-addtocart-button',
+        '.js-addtocart js-prod-submit-form',
+        '.js-prod-submit-form',
         '.btn-add-to-cart',
-        'input[name="add_to_cart"]',
-        'button[type="submit"].js-add-to-cart-button'
+        'input[type="submit"].js-addtocart',
+        '#product_form input[type="submit"]',
+        '[data-store="product-buy-button"]'
     ];
 
     function initBuyNow() {
+        console.log('🔍 Zerocart: Buscando botón de compra...');
         let addToCartBtn = null;
         for (const selector of ADD_TO_CART_SELECTORS) {
             const btn = document.querySelector(selector);
-            if (btn) {
+            if (btn && btn.offsetParent !== null) { // Verificar que sea visible
                 addToCartBtn = btn;
+                console.log('✅ Zerocart: Botón encontrado con selector:', selector);
                 break;
             }
         }
 
         if (!addToCartBtn) {
-            console.log('⚠️ Zerocart: No se encontró el botón de compra.');
+            // Reintentar en un momento si no se encuentra (algunos temas cargan dinámicamente)
+            setTimeout(initBuyNow, 2000);
             return;
         }
+
+        if (document.getElementById('zerocart-buy-now')) return;
 
         addToCartBtn.style.display = 'none';
 
         const buyNowBtn = document.createElement('button');
+        buyNowBtn.id = 'zerocart-buy-now';
         buyNowBtn.innerHTML = '⚡ ${store.oneClickText}';
         buyNowBtn.type = 'button';
 
@@ -104,7 +112,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
             const form = addToCartBtn.closest('form');
             const variantInput = form ? form.querySelector('input[name="variant_id"]') : null;
-            const variantId = variantInput ? (variantInput as HTMLInputElement).value : null;
+            const variantId = variantInput ? variantInput.value : null;
 
             if (!variantId) {
                 console.error('❌ Zerocart: No se pudo identificar el Variant ID.');

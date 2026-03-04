@@ -1,0 +1,5 @@
+[    1076ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://vendemostransformacion.mitiendanube.com/favicon.ico:0
+[  207414ms] [ERROR] ❌ Zerocart: No se pudo encontrar el Store ID en la ventana global. @ https://apps-scripts.tiendanube.com/zerocart/zerocart-buy-now/2.js?versionId=YSGdLgcNkUNgaCNEmKRc2ysQQOS.zYRc&store=7317678:4
+[  215489ms] Unexpected identifier 'as'
+[  216689ms] Unexpected identifier 'as'
+[  218122ms] Unexpected identifier 'as'
