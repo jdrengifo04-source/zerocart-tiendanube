@@ -69,8 +69,9 @@ export const updateProductLink = async (req: Request, res: Response) => {
 export const registerBuyNowScript = async (req: Request, res: Response) => {
     try {
         const tnService = req.tnService!;
-        // URL base para el script inyectable (zerocart.jrengifo.com/public/scripts/buy-now.js)
-        const scriptUrl = `https://zerocart.jrengifo.com/public/scripts/buy-now.js`;
+        const storeId = (req as any).storeId;
+        // URL base para el script inyectable apuntando al endpoint dinámico
+        const scriptUrl = `https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=${storeId}`;
         const result = await tnService.registerScript(scriptUrl);
         res.json({ message: 'Script de "Comprar Ahora" registrado con éxito', result });
     } catch (error: any) {

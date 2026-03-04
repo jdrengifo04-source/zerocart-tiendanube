@@ -8,6 +8,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.js';
 import { handleTiendanubeCallback } from './controllers/auth.controller.js';
+import { getStoreConfig, updateStoreConfig } from './controllers/config.controller.js';
+import { serveDynamicScript } from './controllers/script.controller.js';
 import { authStore } from './middleware/authStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,6 +48,8 @@ app.post('/api/webhooks/order-paid', handleOrderPaidWebhook);
 app.get('/api/products', authStore, getProducts);
 app.put('/api/products/link', authStore, updateProductLink);
 app.post('/api/install-scripts', authStore, registerBuyNowScript);
+app.get('/api/store/config', authStore, getStoreConfig);
+app.patch('/api/store/config', authStore, updateStoreConfig);
 
 // 2. SERVIR FRONTEND DE ADMINISTRACIÓN (React)
 const clientDistPath = path.join(__dirname, '../client-dist');

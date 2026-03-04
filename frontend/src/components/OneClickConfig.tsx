@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Card, Button, Input } from 'speed-code';
-import { ToggleLeft, ToggleRight, Check, Palette, Expand, Zap, ImageIcon } from 'lucide-react';
+import { ToggleLeft, ToggleRight, Check, Palette, Expand, Zap, ImageIcon, Loader2 } from 'lucide-react';
 
 interface Product {
     id: number;
@@ -21,6 +22,65 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
     const [bgColor, setBgColor] = useState('#0052FF'); // Primary Brand Color
     const [textColor, setTextColor] = useState('#FFFFFF');
     const [buttonSize, setButtonSize] = useState<'normal' | 'grande' | 'completo'>('normal');
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const response = await axios.get('/api/store/config');
+                const config = response.data;
+                setIsEnabled(config.oneClickEnabled);
+                setButtonText(config.oneClickText);
+                setBgColor(config.oneClickBgColor);
+                setTextColor(config.oneClickTextColor);
+                setButtonSize(config.oneClickSize);
+            } catch (error) {
+                console.error('Error fetching One Click config', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchConfig();
+    }, []);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await axios.patch('/api/store/config', {
+                oneClickEnabled: isEnabled,
+                oneClickText: buttonText,
+                oneClickBgColor: bgColor,
+                oneClickTextColor: textColor,
+                oneClickSize: buttonSize
+            });
+            // Si está habilitado, registramos/actualizamos el script en Tiendanube
+            if (isEnabled) {
+                try {
+                    await axios.post('/api/install-scripts');
+                    console.log('Script registrado en Tiendanube con éxito');
+                } catch (scriptError) {
+                    console.error('Error registrando script en Tiendanube', scriptError);
+                }
+            }
+            console.log('Configuración guardada correctamente');
+            alert('Configuración guardada y botón activado en tu tienda');
+        } catch (error) {
+            console.error('Error saving config', error);
+            alert('Hubo un error al guardar la configuración');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center p-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
@@ -131,9 +191,17 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                     </div>
 
                     <div className={`transition-all duration-500 flex justify-end ${isEnabled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                        <Button className="bg-white dark:bg-primary text-slate-900 dark:text-white border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-primary/80 rounded-xl font-bold px-8 py-6 h-auto shadow-sm dark:shadow-xl dark:shadow-primary/10 group transition-all">
-                            <Check className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform text-emerald-500 dark:text-white" />
-                            Guardar Configuración
+                        <Button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="bg-white dark:bg-primary text-slate-900 dark:text-white border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-primary/80 rounded-xl font-bold px-8 py-6 h-auto shadow-sm dark:shadow-xl dark:shadow-primary/10 group transition-all"
+                        >
+                            {isSaving ? (
+                                <Loader2 className="mr-2 w-5 h-5 animate-spin text-slate-500 dark:text-white" />
+                            ) : (
+                                <Check className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform text-emerald-500 dark:text-white" />
+                            )}
+                            {isSaving ? 'Guardando...' : 'Guardar Configuración'}
                         </Button>
                     </div>
                 </div>

@@ -15,13 +15,18 @@ datasource db {
 
 
 model Store {
-  id           String    @id // ID de Tiendanube
-  accessToken  String
-  storeName    String?
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  products     Product[]
+  id                String    @id // ID de Tiendanube
+  accessToken       String
+  storeName         String?
+  isActive          Boolean   @default(true)
+  oneClickEnabled   Boolean   @default(false)
+  oneClickText      String    @default("Comprar Ahora")
+  oneClickBgColor   String    @default("#0052FF")
+  oneClickTextColor String    @default("#FFFFFF")
+  oneClickSize      String    @default("normal")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  products          Product[]
 }
 
 model Product {
