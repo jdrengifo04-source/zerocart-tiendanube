@@ -165,7 +165,9 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                     throw new Error('Fallo en la API de Tiendanube');
                 }
             } catch (error) {
-                window.location.href = '/checkout';
+                console.error('❌ Zerocart Error:', error);
+                const fallbackUrl = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
+                window.location.href = fallbackUrl;
             }
         };
     }
