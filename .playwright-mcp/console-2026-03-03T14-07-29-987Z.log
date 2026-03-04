@@ -1,0 +1,5 @@
+[  157653ms] [ERROR] Error loading products: AxiosError: Network Error
+    at XMLHttpRequest.handleError (http://localhost:3001/node_modules/.vite/deps/axios.js?v=237a37fd:1717:19)
+    at Axios.request (http://localhost:3001/node_modules/.vite/deps/axios.js?v=237a37fd:2328:41)
+    at async fetchProducts (http://localhost:3001/src/App.tsx:56:24) @ http://localhost:3001/src/App.tsx:58
+[  157654ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:3001/api/products:0

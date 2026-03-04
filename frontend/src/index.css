@@ -5,133 +5,142 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
 
-  color-scheme: light;
-  background-color: #f8f9fa;
-  color: #0f172a;
+    color-scheme: light;
+    background-color: #f8f9fa;
+    color: #0f172a;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    --sidebar-navy: #0f1c3d;
+    /* More bluish tinted navy */
+    --sidebar-width: 272px;
+    --sidebar-collapsed-width: 80px;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
-  color-scheme: dark;
-  background-color: #000000;
-  color: #f8fafc;
+    color-scheme: dark;
+    background-color: #000000;
+    color: #f8fafc;
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Typography */
 .font-sora {
-  font-family: 'Sora', sans-serif;
+    font-family: 'Sora', sans-serif;
 }
 
 /* Tracking tight for display fonts */
 .tracking-tightest {
-  letter-spacing: -0.04em;
+    letter-spacing: -0.04em;
 }
 
 /* Sidebar Active State (ExitBot Style) */
 .sidebar-active-glow {
-  background: rgba(0, 82, 255, 0.15);
-  /* More prominent brand blue */
-  position: relative;
-  overflow: hidden;
+    background: rgba(0, 82, 255, 0.15);
+    /* More prominent brand blue */
+    position: relative;
+    overflow: hidden;
 }
 
 .sidebar-active-glow::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  background: #0052FF;
-  box-shadow: 0 0 15px rgba(0, 82, 255, 0.6);
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: #0052FF;
+    box-shadow: 0 0 15px rgba(0, 82, 255, 0.6);
 }
 
 /* Custom Smooth Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+    width: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Card Improvements */
 .premium-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark .premium-card {
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: none;
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: none;
 }
 
 .premium-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.1);
 }
 
 .dark .premium-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: #111111;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: #111111;
 }
 
 /* Dashboard Metrics */
 .metric-card {
-  border-radius: 24px;
+    border-radius: 24px;
 }
 
 /* Integration status pulse */
 @keyframes status-pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
 
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-  }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
 
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
 }
 
 .animate-status-pulse {
-  animation: status-pulse 2s infinite;
+    animation: status-pulse 2s infinite;
 }
 
 /* Theme transition */
 .theme-transition {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }

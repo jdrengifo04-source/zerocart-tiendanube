@@ -70,7 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, saving, onLinkChange
                 <Button
                     onClick={() => onSave(product.id, product.googleDriveLink)}
                     disabled={saving}
-                    className="flex-1 h-10 rounded-xl bg-slate-900 dark:bg-primary text-white hover:bg-black dark:hover:bg-primary/80 font-bold text-xs gap-2 shadow-lg shadow-black/5 transition-all"
+                    className="flex-1 h-10 rounded-xl bg-white dark:bg-primary text-slate-900 dark:text-white border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-primary/80 font-bold text-xs gap-2 shadow-sm dark:shadow-lg dark:shadow-black/5 transition-all"
                 >
                     {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                     {saving ? 'Guardando...' : 'Actualizar'}
