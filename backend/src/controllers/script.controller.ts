@@ -30,6 +30,9 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             return res.type('application/javascript').send('console.log("🚀 Zerocart: Función 1 Click $ deshabilitada para esta tienda.");');
         }
 
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const hostUrl = process.env.BACKEND_URL || `${protocol}://${req.get('host')}`;
+
         const scriptContent = `
 (function () {
     console.log('🚀 Zerocart: Botón "${store.oneClickText}" activado.');
@@ -242,7 +245,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             return;
         }
 
-        const backendUrl = '${process.env.BACKEND_URL || ""}';
+        const backendUrl = '${hostUrl}';
         const storeId = '${storeId}';
 
         fetch(backendUrl + '/api/order/details?order_id=' + orderId + '&store_id=' + storeId)
