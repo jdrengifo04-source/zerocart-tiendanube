@@ -68,15 +68,16 @@ export const updateProductLink = async (req: Request, res: Response) => {
 
 export const registerBuyNowScript = async (req: Request, res: Response) => {
     try {
-        const tnService = req.tnService!;
-        const storeId = (req as any).storeId;
-        // URL base para el script inyectable apuntando al endpoint dinámico
-        const scriptUrl = `https://zerocart.jrengifo.com/api/scripts/buy-now.js?store_id=${storeId}`;
-        const result = await tnService.registerScript(scriptUrl);
-        res.json({ message: 'Script de "Comprar Ahora" registrado con éxito', result });
+        // La registración del script ahora se maneja globalmente desde el Panel de Partners de Tiendanube
+        // mediante la opción "Instalación automática" y el script ID #5084.
+        // No es necesario realizar llamadas por cada tienda.
+        res.json({
+            message: 'Configuración sincronizada con el script global de Zerocart',
+            script_id: '#5084'
+        });
     } catch (error: any) {
-        console.error('Error registrando script:', error.response?.data || error.message);
-        res.status(500).json({ error: 'Fallo al registrar el script en la tienda' });
+        console.error('Error en sync de script:', error.message);
+        res.status(500).json({ error: 'Fallo al sincronizar la configuración' });
     }
 };
 
