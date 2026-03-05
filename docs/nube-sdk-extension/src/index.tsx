@@ -21,8 +21,8 @@ export function App(nube: NubeSDK) {
 
             // Render a loading state first
             nube.render("after_main_content", (
-                <Box padding="20px" borderRadius="8px" background="#f0f9ff" style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "#bae6fd" }}>
-                    <Text color="#0369a1" modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
+                <Box padding="16px" background="surfaceSecondary">
+                    <Text modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
                 </Box>
             ));
 
@@ -38,18 +38,18 @@ export function App(nube: NubeSDK) {
                 if (data && data.products && data.products.length > 0) {
                     // Render the Download Card using declarative components
                     nube.render("after_main_content", (
-                        <Box padding="20px" borderRadius="8px" background="#fefce8" style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "#fef08a" }}>
-                            <Text color="#854d0e" modifiers={["bold"]}>
+                        <Box padding="16px" background="surfaceSuccess">
+                            <Text modifiers={["bold"]}>
                                 {data.config?.headline || "¡Aquí tienes tus productos digitales!"}
                             </Text>
-                            <Box margin="10px">
-                                <Text color="#713f12">
+                            <Box margin="8px">
+                                <Text>
                                     {data.config?.message || "Haz clic en el enlace de abajo para acceder a tus archivos de Google Drive asociados a esta compra."}
                                 </Text>
                             </Box>
 
                             {data.products.map((product: any) => (
-                                <Box key={product.id} margin="10px">
+                                <Box key={product.id} margin="8px">
                                     <Link href={product.googleDriveLink} variant="primary" target="_blank">
                                         Descargar {product.name}
                                     </Link>
@@ -60,8 +60,8 @@ export function App(nube: NubeSDK) {
                 } else {
                     // Render generic success if no digital products are found
                     nube.render("after_main_content", (
-                        <Box padding="20px" borderRadius="8px" background="#f0fdf4" style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "#bbf7d0" }}>
-                            <Text color="#166534">
+                        <Box padding="16px" background="surfaceSuccess">
+                            <Text>
                                 Tus archivos digitales (si aplicables) estarán disponibles pronto en tu correo electrónico.
                             </Text>
                         </Box>
@@ -70,8 +70,8 @@ export function App(nube: NubeSDK) {
             } catch (error) {
                 console.error("Error fetching drive URL:", error);
                 nube.render("after_main_content", (
-                    <Box padding="20px" borderRadius="8px" background="#fef2f2" style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "#fecaca" }}>
-                        <Text color="#991b1b">
+                    <Box padding="16px" background="surfaceError">
+                        <Text>
                             Hubo un problema al cargar el enlace, revisa tu correo electrónico para obtener los archivos.
                         </Text>
                     </Box>
@@ -79,7 +79,7 @@ export function App(nube: NubeSDK) {
             }
         } else {
             // Clear the slot if we navigate away from the success step
-            nube.clearSlot("after_main_content");
+            nube.render("after_main_content", []);
         }
     });
 }

@@ -65,13 +65,6 @@ El objetivo es saltarse el carrito intermedio y enviar al cliente directo a paga
   4. El script construye la URL de checkout directo: `/checkout/v3/start/{cart_id}/{cart_token}?from_store=1`.
   5. Finalmente, redirige al usuario a esa URL, logrando el flujo de "Un solo clic".
 
-### 3. Flujo Completo: "Página de Gracias" (Entrega de PDF)
-El objetivo es entregar el link de descarga (Google Drive) justo cuando el cliente termina de pagar.
-
-- **Detección de Interfaz**: El script monitorea la URL. Si detecta `/checkout/v3/success/`, activa el flujo de entrega.
-- **Extracción de Orden**: Extrae el ID de la orden directamente de la URL (Ej. `/checkout/v3/success/1903742740/...`).
-- **Petición al Backend**: Envía una petición `GET` a nuestro backend (`/api/order/details?order_id=...&store_id=...`).
-- **Verificación en Servidor**: El backend (`order.controller.ts`) hace una petición a la API oficial de Tiendanube usando el Token de la tienda para verificar que el pedido realmente esté pago (Status: `paid` o `approved`).
 - **Respuesta y Renderizado (NubeSDK)**: Si el pedido es pago, el backend devuelve los enlaces. La extensión, corriendo dentro del **Web Worker** del Checkout, utiliza `nube.render("after_main_content", <Box>...)` empleando componentes declarativos nativos de `@tiendanube/nube-sdk-ui`.
 *(Nota: El flujo antiguo vía inyección directa al DOM ya NO es viable en Checkout V3 debido a restricciones de seguridad. Toda interacción gráfica debe usar la librería `nube-sdk-jsx` compilada en un único archivo `index.global.js` como se detalla en [Extensión NubeSDK](docs/NUBE_SDK_EXTENSION.md)).*
 
