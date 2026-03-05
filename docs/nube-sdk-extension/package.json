@@ -1,0 +1,24 @@
+{
+  "name": "nube-sdk-extension",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tiendanube/nube-sdk-jsx": "^0.16.0",
+    "@tiendanube/nube-sdk-types": "^0.57.0",
+    "@tiendanube/nube-sdk-ui": "^0.17.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-singlefile": "^2.3.0"
+  }
+}

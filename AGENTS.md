@@ -31,13 +31,14 @@ El proyecto es un monorepo simplificado:
 - ✅ Integración DB/API "1 Click $": Configuración guardada en PostgreSQL vía Prisma. Función de autoinyección del Script dinámico vía API de Tiendanube.
 - ✅ Redirección Directa a Checkout: Solucionado el error de carrito vacío mediante flujo AJAX al endpoint `/comprar/`, permitiendo redirección directa a la URL final de pago (`/checkout/v3/start/...`).
 - ✅ Permisos de Tiendanube configurados: Identificados y habilitados los alcances necesarios (Products, Scripts, Orders, Customers) para la próxima fase de Página de Gracias y Descarga de PDFs.
+- 🔄 (En curso) Implementación de flujo "Página de Gracias" vía NubeSDK (Checkout Extension V3) aislando React en un Web Worker.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
-- 🔄 (Pendiente) Desarrollo de flujo "Página de Gracias" para entrega de PDFs vinculado al webhook de Orders.
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
 
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)
 - [Solución Redirección One-Click](docs/ONE_CLICK_CHECKOUT.md)
+- [Extensión Checkout V3 (NubeSDK)](docs/NUBE_SDK_EXTENSION.md)
 - [Guía de Despliegue y Ops](docs/DEPLOYMENT.md)
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)
 
@@ -71,9 +72,17 @@ El objetivo es entregar el link de descarga (Google Drive) justo cuando el clien
 - **Extracción de Orden**: Extrae el ID de la orden directamente de la URL (Ej. `/checkout/v3/success/1903742740/...`).
 - **Petición al Backend**: Envía una petición `GET` a nuestro backend (`/api/order/details?order_id=...&store_id=...`).
 - **Verificación en Servidor**: El backend (`order.controller.ts`) hace una petición a la API oficial de Tiendanube usando el Token de la tienda para verificar que el pedido realmente esté pago (Status: `paid` o `approved`).
-- **Respuesta y Renderizado**: Si el pedido es válido y pago, el backend devuelve la configuración de la tarjeta y los enlaces de descarga. El script inyecta un contenedor HTML (`id="zerocart-thank-you"`) al inicio de la página `.checkout-container` para mostrar el enlace de descarga directo.
+- **Respuesta y Renderizado (NubeSDK)**: Si el pedido es pago, el backend devuelve los enlaces. La extensión, corriendo dentro del **Web Worker** del Checkout, utiliza `nube.render("after_main_content", <Box>...)` empleando componentes declarativos nativos de `@tiendanube/nube-sdk-ui`.
+*(Nota: El flujo antiguo vía inyección directa al DOM ya NO es viable en Checkout V3 debido a restricciones de seguridad. Toda interacción gráfica debe usar la librería `nube-sdk-jsx` compilada en un único archivo `index.global.js` como se detalla en [Extensión NubeSDK](docs/NUBE_SDK_EXTENSION.md)).*
 
-### 4. Key Learnings (Aprendizajes Clave)
+### 4. Flujo Alternativo: Entrega por Correo (Fallback)
+Ante las estrictas limitaciones del Sandbox del Checkout V3 (que elimina el acceso al DOM), se desarrolló un plan B robusto:
+- **Webhook**: Cuando la compra se completa, Tiendanube dispara el webhook `order/paid` hacia `/api/webhooks/order-paid`.
+- **Detección de Productos Digitales**: El backend busca si los productos comprados tienen un enlace de Google Drive asociado en la base de datos de Zerocart.
+- **Servicio de Email (`email.service.ts`)**: Si hay productos digitales, el backend utiliza `nodemailer` (configurado con SMTP o Resend en producción) para compilar una plantilla HTML.
+- **Envío Automático**: El cliente recibe un correo instantáneo titulado "¡Tus productos digitales están listos!" (o el título personalizado de la tienda) con el botón directo a Google Drive, saltándose por completo la necesidad de modificar el frontend del checkout.
+
+### 5. Key Learnings (Aprendizajes Clave)
 - **Script Activation**: En el Portal de Partners, para inyectar scripts, usa el evento `onfirstinteraction`. El evento `onload` puede ser bloqueado o ejecutarse demasiado temprano en algunos temas.
 - **Robust Selectors**: Los temas de Tiendanube varían mucho. Siempre busca por `.js-addtocart`, `.js-prod-submit-form` y selecciona el formulario padre más cercano para extraer la "Variante".
 - **Comprar vs Cart Add**: Algunos temas usan directamente el `product_id` en `add_to_cart`. Usar el endpoint `/comprar/` con variables AJAX es mucho más estable que intentar enviar formularios estándar (que llevan al carrito).
