@@ -130,13 +130,16 @@ const pollForNube = (retries = 20) => {
     console.log(`[ZeroCart] 🔍 Discovery Attempt (${21 - retries}): Keys: ${keys}`);
 
     // @ts-ignore
-    const sdk = (globalThis as any).nube || (self as any).nube;
+    const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube;
 
     if (sdk) {
         console.log("[ZeroCart] ✅ NubeSDK found via polling!");
         initZeroCartExtension(sdk);
     } else if (retries > 0) {
-        // Continue polling every 250ms
+        // Log keys every 4 attempts (1 second) to avoid flooding but keep track
+        if (retries % 4 === 0) {
+            console.log(`[ZeroCart] 🔍 Still searching... (Attempt ${21 - retries})`);
+        }
         setTimeout(() => pollForNube(retries - 1), 250);
     } else {
         console.error("[ZeroCart] ❌ NubeSDK not found after polling. The environment might be missing the expected 'nube' global.");
