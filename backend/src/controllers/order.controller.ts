@@ -2,15 +2,15 @@ import { Request, Response } from 'express';
 import { TiendanubeService } from '../services/tiendanube.service.js';
 import prisma from '../lib/prisma.js';
 
-// GET /api/order/details?order_id=...&store_id=...
+// GET /api/order/details?cart_id=...&store_id=...
 export const getOrderDetails = async (req: Request, res: Response) => {
     try {
-        const { order_id, store_id } = req.query;
+        const { cart_id, store_id } = req.query;
 
-        console.log(`🔍 Consultando detalles de pedido #${order_id} para tienda ${store_id}`);
+        console.log(`🔍 Consultando detalles del carrito #${cart_id} para tienda ${store_id}`);
 
-        if (!order_id || !store_id) {
-            return res.status(400).json({ error: 'Order ID and Store ID are required' });
+        if (!cart_id || !store_id) {
+            return res.status(400).json({ error: 'Cart ID and Store ID are required' });
         }
 
         // 1. Buscar la tienda y su token
@@ -23,16 +23,23 @@ export const getOrderDetails = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Store not found' });
         }
 
-        // 2. Consultar el pedido en Tiendanube
+        // 2. Consultar el pedido en Tiendanube por cart_id
         const tnService = new TiendanubeService(store_id.toString(), store.accessToken);
-        const order = await tnService.getOrder(order_id.toString());
+        const ordersResponse = await tnService.getOrderByCartId(cart_id.toString());
+
+        if (!ordersResponse || ordersResponse.length === 0) {
+            console.error(`❌ Pedido asociado al carrito ${cart_id} no encontrado en Tiendanube`);
+            return res.status(404).json({ error: 'Order not found for this cart' });
+        }
+
+        const order = ordersResponse[0];
 
         // 3. Verificar que el pedido esté pago
         // Tiendanube usa 'paid' para status y payment_status
         const isPaid = order.status === 'paid' || order.payment_status === 'paid' || order.payment_status === 'approved';
 
         if (!isPaid) {
-            console.warn(`⚠️ Pedido #${order_id} no está marcado como pago. Status: ${order.status}, Payment: ${order.payment_status}`);
+            console.warn(`⚠️ Pedido #${order.id} (Cart: ${cart_id}) no está marcado como pago. Status: ${order.status}, Payment: ${order.payment_status}`);
             return res.status(403).json({
                 error: 'Order is not paid yet',
                 status: order.status,
@@ -69,7 +76,7 @@ export const getOrderDetails = async (req: Request, res: Response) => {
             }).filter((p: any) => p.googleDriveLink !== null) // Solo devolver los que tienen link digital
         };
 
-        console.log(`✅ Entregando links para ${responseData.products.length} productos del pedido #${order_id}`);
+        console.log(`✅ Entregando links para ${responseData.products.length} productos del pedido #${order.id}`);
         res.json(responseData);
     } catch (error: any) {
         console.error('❌ Error fetching order details:', error.response?.data || error.message);

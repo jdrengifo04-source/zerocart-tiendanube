@@ -28,7 +28,7 @@ export function App(nube: NubeSDK) {
 
             try {
                 // Fetch order details from our backend to get the drive URL
-                const response = await fetch(`https://api.zerocart.app/api/order/details?order_id=${orderIdentifier}&store_id=${storeId}`);
+                const response = await fetch(`https://api.zerocart.app/api/order/details?cart_id=${orderIdentifier}&store_id=${storeId}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch order details.");
                 }

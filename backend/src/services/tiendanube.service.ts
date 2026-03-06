@@ -35,6 +35,14 @@ export class TiendanubeService {
         return response.data;
     }
 
+    async getOrderByCartId(cartId: string) {
+        // Query orders by cart_id (which returns an array)
+        const response = await axios.get(`${TIENDANUBE_API_URL}/${this.storeId}/orders?cart_id=${cartId}`, {
+            headers: this.getHeaders()
+        });
+        return response.data;
+    }
+
     async registerScript(src: string) {
         const response = await axios.post(`${TIENDANUBE_API_URL}/${this.storeId}/scripts`,
             {
