@@ -2,10 +2,10 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
     entry: ['src/index.tsx'],
-    format: ['esm'],
-    minify: true,
+    format: ['iife'],
+    target: 'es2020',
     clean: true,
-    bundle: true,
-    noExternal: [/(.*)/], // bundle everything
-    outExtension: () => ({ js: '.global.js' })
+    minify: true, // Tiendanube recommends minifying
+    sourcemap: false,
+    outExtension: () => ({ js: '.global.js' }),
 });
