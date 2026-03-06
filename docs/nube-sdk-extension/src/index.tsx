@@ -1,13 +1,23 @@
 import type { NubeSDK } from "@tiendanube/nube-sdk-types";
-import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx";
 
 /**
- * [ZeroCart] NubeSDK Checkout Extension - Version 19
+ * [ZeroCart] NubeSDK Checkout Extension - Version 20
  * 
- * Optimized for Navigation Detection in Checkout V3.
+ * Manual Component Construction to bypass "Component undefined" error.
  */
+
+// Helper to create platform-compliant component objects
+const createComponent = (name: string, props: any) => ({
+    component: name,
+    props: props
+});
+
+const Box = (props: any) => createComponent("Box", props);
+const Text = (props: any) => createComponent("Text", props);
+const Link = (props: any) => createComponent("Link", props);
+
 export function App(nube: NubeSDK) {
-    console.log("[ZeroCart] 🚀 Extension initialized (v19).");
+    console.log("[ZeroCart] 🚀 Extension initialized (v20 - Manual Components).");
 
     if (!nube) {
         console.error("[ZeroCart] ❌ 'nube' object missing!");
@@ -19,11 +29,14 @@ export function App(nube: NubeSDK) {
     const renderContent = async (cartId: string, storeId: string) => {
         console.log("[ZeroCart] 💎 Rendering content for ID:", cartId);
 
-        nube.render("after_main_content", (
-            <Box padding="16px" background="surfaceSecondary">
-                <Text modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
-            </Box>
-        ));
+        // Initial loading state
+        nube.render("after_main_content", [
+            Box({
+                padding: "16px",
+                background: "surfaceSecondary",
+                children: [Text({ children: ["Cargando tu enlace de descarga..."] })]
+            })
+        ]);
 
         try {
             const url = `https://zerocart.jrengifo.com/api/order/details?cart_id=${cartId}&store_id=${storeId}`;
@@ -33,11 +46,13 @@ export function App(nube: NubeSDK) {
             if (!response.ok) {
                 console.warn(`[ZeroCart] Fetch failed (${response.status})`);
                 if (response.status === 404) {
-                    nube.render("after_main_content", (
-                        <Box padding="16px" background="surfaceSecondary">
-                            <Text>Tu pedido digital se está procesando... revisa tu email en unos minutos.</Text>
-                        </Box>
-                    ));
+                    nube.render("after_main_content", [
+                        Box({
+                            padding: "16px",
+                            background: "surfaceSecondary",
+                            children: [Text({ children: ["Tu pedido digital se está procesando... revisa tu email en unos minutos."] })]
+                        })
+                    ]);
                     return;
                 }
                 throw new Error(`Status ${response.status}`);
@@ -47,35 +62,55 @@ export function App(nube: NubeSDK) {
             console.log("[ZeroCart] 📦 Data received:", data);
 
             if (data && data.products && data.products.length > 0) {
-                nube.render("after_main_content", (
-                    <Box padding="16px" background="surfaceSuccess">
-                        <Text modifiers={["bold"]}>{data.config?.headline || "¡Aquí tienes tus productos digitales!"}</Text>
-                        <Box margin="8px">
-                            <Text>{data.config?.message || "Haz clic abajo para acceder a tus archivos."}</Text>
-                        </Box>
-                        {data.products.map((p: any) => (
-                            <Box key={p.id} margin="8px">
-                                <Link href={p.googleDriveLink} variant="primary" target="_blank">
-                                    Descargar {p.name}
-                                </Link>
-                            </Box>
-                        ))}
-                    </Box>
-                ));
+                const productLinks = data.products.map((p: any) =>
+                    Box({
+                        margin: "8px",
+                        children: [
+                            Link({
+                                href: p.googleDriveLink,
+                                variant: "primary",
+                                target: "_blank",
+                                children: [`Descargar ${p.name}`]
+                            })
+                        ]
+                    })
+                );
+
+                nube.render("after_main_content", [
+                    Box({
+                        padding: "16px",
+                        background: "surfaceSuccess",
+                        children: [
+                            Text({
+                                children: [data.config?.headline || "¡Aquí tienes tus productos digitales!"],
+                                modifiers: ["bold"]
+                            }),
+                            Box({
+                                margin: "8px",
+                                children: [Text({ children: [data.config?.message || "Haz clic abajo para acceder a tus archivos."] })]
+                            }),
+                            ...productLinks
+                        ]
+                    })
+                ]);
             } else {
-                nube.render("after_main_content", (
-                    <Box padding="16px" background="surfaceSecondary">
-                        <Text>Tus archivos digitales estarán pronto en tu correo.</Text>
-                    </Box>
-                ));
+                nube.render("after_main_content", [
+                    Box({
+                        padding: "16px",
+                        background: "surfaceSecondary",
+                        children: [Text({ children: ["Tus archivos digitales estarán pronto en tu correo."] })]
+                    })
+                ]);
             }
         } catch (error) {
             console.error("[ZeroCart] ❌ Render Error:", error);
-            nube.render("after_main_content", (
-                <Box padding="16px" background="surfaceError">
-                    <Text>Hubo un problema. Revisa tu email para los enlaces.</Text>
-                </Box>
-            ));
+            nube.render("after_main_content", [
+                Box({
+                    padding: "16px",
+                    background: "surfaceError",
+                    children: [Text({ children: ["Hubo un problema. Revisa tu email para los enlaces."] })]
+                })
+            ]);
         }
     };
 
@@ -86,7 +121,6 @@ export function App(nube: NubeSDK) {
         const pageType = location?.page?.type;
         const step = location?.page?.data?.step;
 
-        // Avoid redundant processing if step hasn't changed
         const currentStepKey = `${pageType}:${step}`;
         if (currentStepKey === lastStep && source !== "initial") return;
         lastStep = currentStepKey;
@@ -102,48 +136,33 @@ export function App(nube: NubeSDK) {
                 renderContent(cartId, storeId);
             } else {
                 console.warn("[ZeroCart] ⚠️ Success detected but IDs missing:", { cartId, storeId });
-                console.log("[ZeroCart] 🧪 Success State Trace:", JSON.stringify({
-                    hasCart: !!cart,
-                    hasOrder: !!order,
-                    cartId: cart?.id,
-                    orderId: order?.id,
-                    orderCartId: order?.cart_id,
-                    locData: location?.page?.data
-                }));
             }
         } else {
-            // Keep clean if not success
             if (pageType !== "checkout" || step !== "success") {
                 nube.render("after_main_content", []);
             }
         }
     };
 
-    // Register all potential events to capture navigation in Checkout V3
     const events = ["location:updated", "cart:updated", "ui:updated", "order:updated"];
     events.forEach(evt => {
         try {
             nube.on(evt as any, (state) => {
-                console.log(`[ZeroCart] 🔔 Event: ${evt}`);
                 handleStateUpdate(state, evt);
             });
-        } catch (e) { /* ignore unsupported events */ }
+        } catch (e) { /* ignore */ }
     });
 
-    // Fallback Watcher (Diagnostic): If events fail, check state manually
     const watcher = setInterval(() => {
         try {
             const state = nube.getState?.();
             if (state) handleStateUpdate(state, "watcher");
-        } catch (e) {
-            console.error("[ZeroCart] Watcher error:", e);
-        }
+        } catch (e) { }
     }, 2500);
 
-    // Initial check
     const initialState = nube.getState?.();
     if (initialState) handleStateUpdate(initialState, "initial");
 
-    // Cleanup (though App is usually alive for the checkout duration)
     return () => clearInterval(watcher);
 }
+
