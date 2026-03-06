@@ -1,23 +1,13 @@
 import type { NubeSDK } from "@tiendanube/nube-sdk-types";
 
 /**
- * [ZeroCart] NubeSDK Checkout Extension - Version 20
+ * [ZeroCart] NubeSDK Checkout Extension - Version 21
  * 
- * Manual Component Construction to bypass "Component undefined" error.
+ * Strict Component JSON Structure based on @tiendanube/nube-sdk-types definitions.
  */
 
-// Helper to create platform-compliant component objects
-const createComponent = (name: string, props: any) => ({
-    component: name,
-    props: props
-});
-
-const Box = (props: any) => createComponent("Box", props);
-const Text = (props: any) => createComponent("Text", props);
-const Link = (props: any) => createComponent("Link", props);
-
 export function App(nube: NubeSDK) {
-    console.log("[ZeroCart] 🚀 Extension initialized (v20 - Manual Components).");
+    console.log("[ZeroCart] 🚀 Extension initialized (v21 - Strict JSON Components).");
 
     if (!nube) {
         console.error("[ZeroCart] ❌ 'nube' object missing!");
@@ -31,11 +21,14 @@ export function App(nube: NubeSDK) {
 
         // Initial loading state
         nube.render("after_main_content", [
-            Box({
+            {
+                type: "box",
                 padding: "16px",
                 background: "surfaceSecondary",
-                children: [Text({ children: ["Cargando tu enlace de descarga..."] })]
-            })
+                children: [
+                    { type: "txt", children: "Cargando tu enlace de descarga..." }
+                ]
+            }
         ]);
 
         try {
@@ -47,11 +40,14 @@ export function App(nube: NubeSDK) {
                 console.warn(`[ZeroCart] Fetch failed (${response.status})`);
                 if (response.status === 404) {
                     nube.render("after_main_content", [
-                        Box({
+                        {
+                            type: "box",
                             padding: "16px",
                             background: "surfaceSecondary",
-                            children: [Text({ children: ["Tu pedido digital se está procesando... revisa tu email en unos minutos."] })]
-                        })
+                            children: [
+                                { type: "txt", children: "Tu pedido digital se está procesando... revisa tu email en unos minutos." }
+                            ]
+                        }
                     ]);
                     return;
                 }
@@ -62,54 +58,65 @@ export function App(nube: NubeSDK) {
             console.log("[ZeroCart] 📦 Data received:", data);
 
             if (data && data.products && data.products.length > 0) {
-                const productLinks = data.products.map((p: any) =>
-                    Box({
-                        margin: "8px",
-                        children: [
-                            Link({
-                                href: p.googleDriveLink,
-                                variant: "primary",
-                                target: "_blank",
-                                children: [`Descargar ${p.name}`]
-                            })
-                        ]
-                    })
-                );
+                const productLinks = data.products.map((p: any) => ({
+                    type: "box",
+                    margin: "8px",
+                    children: [
+                        {
+                            type: "link",
+                            href: p.googleDriveLink,
+                            variant: "primary",
+                            target: "_blank",
+                            children: `Descargar ${p.name}`
+                        }
+                    ]
+                }));
 
                 nube.render("after_main_content", [
-                    Box({
+                    {
+                        type: "box",
                         padding: "16px",
                         background: "surfaceSuccess",
                         children: [
-                            Text({
-                                children: [data.config?.headline || "¡Aquí tienes tus productos digitales!"],
+                            {
+                                type: "txt",
+                                children: data.config?.headline || "¡Aquí tienes tus productos digitales!",
                                 modifiers: ["bold"]
-                            }),
-                            Box({
+                            },
+                            {
+                                type: "box",
                                 margin: "8px",
-                                children: [Text({ children: [data.config?.message || "Haz clic abajo para acceder a tus archivos."] })]
-                            }),
+                                children: [
+                                    { type: "txt", children: data.config?.message || "Haz clic abajo para acceder a tus archivos." }
+                                ]
+                            },
                             ...productLinks
                         ]
-                    })
+                    }
                 ]);
             } else {
                 nube.render("after_main_content", [
-                    Box({
+                    {
+                        type: "box",
                         padding: "16px",
                         background: "surfaceSecondary",
-                        children: [Text({ children: ["Tus archivos digitales estarán pronto en tu correo."] })]
-                    })
+                        children: [
+                            { type: "txt", children: "Tus archivos digitales estarán pronto en tu correo." }
+                        ]
+                    }
                 ]);
             }
         } catch (error) {
             console.error("[ZeroCart] ❌ Render Error:", error);
             nube.render("after_main_content", [
-                Box({
+                {
+                    type: "box",
                     padding: "16px",
                     background: "surfaceError",
-                    children: [Text({ children: ["Hubo un problema. Revisa tu email para los enlaces."] })]
-                })
+                    children: [
+                        { type: "txt", children: "Hubo un problema. Revisa tu email para los enlaces." }
+                    ]
+                }
             ]);
         }
     };
@@ -165,4 +172,5 @@ export function App(nube: NubeSDK) {
 
     return () => clearInterval(watcher);
 }
+
 

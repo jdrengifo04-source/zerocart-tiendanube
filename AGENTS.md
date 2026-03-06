@@ -65,8 +65,40 @@ El objetivo es saltarse el carrito intermedio y enviar al cliente directo a paga
   4. El script construye la URL de checkout directo: `/checkout/v3/start/{cart_id}/{cart_token}?from_store=1`.
   5. Finalmente, redirige al usuario a esa URL, logrando el flujo de "Un solo clic".
 
-- **Respuesta y Renderizado (NubeSDK)**: Si el pedido es pago, el backend devuelve los enlaces. La extensión, corriendo dentro del **Web Worker** del Checkout, utiliza `nube.render("after_main_content", <Box>...)` empleando componentes declarativos nativos de `@tiendanube/nube-sdk-ui`.
-*(Nota: El flujo antiguo vía inyección directa al DOM ya NO es viable en Checkout V3 debido a restricciones de seguridad. Toda interacción gráfica debe usar la librería `nube-sdk-jsx` compilada en un único archivo `index.global.js` como se detalla en [Extensión NubeSDK](docs/NUBE_SDK_EXTENSION.md)).*
+- **Respuesta y Renderizado (NubeSDK)**: Si el pedido es pago, el backend devuelve los enlaces. La extensión, corriendo dentro del **Web Worker** del Checkout, utiliza `nube.render("after_main_content", [...])` empleando objetos JSON que respetan el esquema estricto de `@tiendanube/nube-sdk-types`.
+
+### 3. Estructura Exacta de Componentes NubeSDK (Checkout V3)
+Debido a que el entorno restringe el uso de React/JSX directamente sin compilación compleja, si construyes los componentes a mano (como en Vanilla JS/TS compilado con tsup), debes usar la estructura **exacta** que espera la plataforma.
+
+**Sintaxis Definitiva:**
+Los objetos nativos NO usan `{ component: "Box", props: {} }`. La propiedad clave es `type` (en minúsculas), y el contenido se pasa en `children`.
+```javascript
+// ✅ CORRECTO:
+{
+  type: "box",
+  background: "#f4f4f4",
+  padding: "16px",
+  children: [
+     {
+        type: "txt", // Textos van con type "txt" (mira types/components.ts)
+        modifiers: ["bold"],
+        children: "Descarga lista"
+     },
+     {
+        type: "link",
+        href: "https://drive.google.com/...",
+        target: "_blank",
+        children: "Descargar"
+     }
+  ]
+}
+
+// ❌ INCORRECTO:
+{ component: "Box", props: { children: "..." } } // Falla silenciosamente o da "Component undefined"
+{ type: "Box" } // Mayúsculas no reconocidas en "type"
+```
+
+*(Nota: El flujo antiguo vía inyección directa al DOM ya NO es viable en Checkout V3 debido a restricciones de seguridad. Toda interacción gráfica debe usar la librería `nube-sdk-jsx` compilada en un único archivo `index.global.js` o construyendo los objetos puros como se describe arriba).*
 
 ### 4. Flujo Alternativo: Entrega por Correo (Fallback)
 Ante las estrictas limitaciones del Sandbox del Checkout V3 (que elimina el acceso al DOM), se desarrolló un plan B robusto:
