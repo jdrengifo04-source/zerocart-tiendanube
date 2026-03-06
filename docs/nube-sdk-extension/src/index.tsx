@@ -124,59 +124,72 @@ const initZeroCartExtension = (injectedNube: any) => {
     }
 };
 
-// DEEP DIAGNOSTIC INSPECTION
+// DEEP DIAGNOSTIC INSPECTION - V13 (The "No stone left unturned" edition)
 const runDeepDiagnostics = () => {
-    console.log("[ZeroCart] 🔎 DEEP DIAGNOSTIC START");
+    console.log("[ZeroCart] 🔎 DEEP DIAGNOSTIC V13 START");
 
     // 1. Inspect __APP_DATA__ and __INITIAL_STATE__
     try {
         const appData = (self as any).__APP_DATA__;
         const initialState = (self as any).__INITIAL_STATE__;
-        console.log("[ZeroCart] 📦 __APP_DATA__ Keys:", appData ? Object.keys(appData).join(", ") : "null");
+        console.log("[ZeroCart] 📦 __APP_DATA__:", JSON.stringify(appData, null, 2));
         console.log("[ZeroCart] 📦 __INITIAL_STATE__ Keys:", initialState ? Object.keys(initialState).join(", ") : "null");
+
+        // Look inside appData
+        if (appData && (appData.nube || appData.sdk || appData.tiendanube)) {
+            console.log("[ZeroCart] 🌟 SDK found INSIDE __APP_DATA__!");
+            initZeroCartExtension(appData.nube || appData.sdk || appData.tiendanube);
+        }
     } catch (e) {
-        console.warn("[ZeroCart] Failed to inspect internal data objects.");
+        console.warn("[ZeroCart] Failed to deep-inspect internal data objects.");
     }
 
-    // 2. Intercept Message Events (Just in case it's injected via postMessage)
+    // 2. Intercept Message Events - Log content if it's a string
     self.addEventListener("message", (event) => {
-        console.log("[ZeroCart] 📩 Message received in worker scope:", {
-            type: typeof event.data,
-            dataKeys: event.data && typeof event.data === 'object' ? Object.keys(event.data).join(", ") : "none"
-        });
+        const data = event.data;
+        const type = typeof data;
+        let content = "unknown";
 
-        // If message contains something that looks like an SDK
-        if (event.data && (event.data.nube || event.data.sdk)) {
-            console.log("[ZeroCart] 🌟 Potential SDK found in message event!");
-            initZeroCartExtension(event.data.nube || event.data.sdk);
+        if (type === "string") content = data;
+        else if (type === "object") {
+            try { content = JSON.stringify(data); } catch { content = "[unserializable object]"; }
+        }
+
+        console.log(`[ZeroCart] 📩 Message received: [Type: ${type}] Content: ${content.substring(0, 200)}`);
+
+        if (data && (data.nube || data.sdk || data.tiendanube)) {
+            console.log("[ZeroCart] 🌟 SDK found in message event!");
+            initZeroCartExtension(data.nube || data.sdk || data.tiendanube);
         }
     });
 
-    // 3. Polling for globals
+    // 3. Polling + Hidden Properties
     const poll = (retries = 20) => {
-        const keys = Object.keys(self).join(", ");
-        // Check for common aliases
-        const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube;
+        // use getOwnPropertyNames to find hidden properties
+        const allKeys = Object.getOwnPropertyNames(self);
+        const sdkKey = allKeys.find(k => k.toLowerCase().includes("nube") || k.toLowerCase() === "sdk");
+
+        const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube || (sdkKey ? (self as any)[sdkKey] : null);
 
         if (sdk) {
-            console.log("[ZeroCart] ✅ NubeSDK found via polling!");
+            console.log(`[ZeroCart] ✅ SDK found! (Key: ${sdkKey || 'standard'})`);
             initZeroCartExtension(sdk);
         } else if (retries > 0) {
             if (retries % 4 === 0) {
-                console.log(`[ZeroCart] 🔍 (Attempt ${21 - retries}) Keys in scope: ${keys}`);
+                console.log(`[ZeroCart] 🔍 (Attempt ${21 - retries}) Keys in scope: ${allKeys.join(", ")}`);
             }
             setTimeout(() => poll(retries - 1), 250);
         } else {
-            console.error("[ZeroCart] ❌ NubeSDK not found. Proveyendo esta lista de llaves al soporte.");
+            console.error("[ZeroCart] ❌ SDK not found. Ready for support email.");
         }
     };
 
     poll();
 };
 
-console.log("[ZeroCart] 🛠️ Script parsing started...");
+console.log("[ZeroCart] 🛠️ Script parsing started (v13)...");
 try {
     runDeepDiagnostics();
 } catch (outerError) {
-    console.error("[ZeroCart] 💀 Fatal crash during diagnostics:", outerError);
+    console.error("[ZeroCart] 💀 Fatal crash:", outerError);
 }
