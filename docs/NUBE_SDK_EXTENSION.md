@@ -82,13 +82,29 @@ Dado que la extensión debe ser asimilada por Tiendanube como un script embebido
 Utilizamos `tsup` (esbuild) en lugar de Vite para generar un único archivo JavaScript extremadamente ligero y estandarizado.
 
 **Configuración requerida (`tsup.config.ts` o equivalente):**
-- **Formato IIFE:** El bundle resultante **debe** exportarse bajo el formato IIFE (Immediately Invoked Function Expression). Las exportaciones CommonJS o ESM no se ejecutarán debidamente al inyectarse.
-- **Minificación y limpieza:** El código final debe estar minificado (`minify: true`) y comprimido en un único archivo, típicamente llamado `index.global.js`.
+- **Formato ESM:** El bundle resultante **debe** exportarse bajo el formato de módulo de ES (`esm`). A diferencia de las extensiones tradicionales en el DOM que usan IIFE, el sandbox de Tiendanube inyecta el script dinámicamente (`import(...)`) y espera encontrar una exportación nombrada `App` (`export function App(nube: NubeSDK) { ... }`).
+- **Minificación y limpieza:** El código final debe estar minificado (`minify: true`) y comprimido en un único archivo, típicamente llamado `index.global.js` o `main.js`.
 - **Sin Dependencias Externas (React):** La build no debe incluir dependencias de `react` o `react-dom`.
 
-## 7. Despliegue y Aprobación (Pendiente Documentación Oficial TN)
+## 7. Despliegue, Testeo y Consideraciones Finales
 
-Los pasos finales requieren asistencia del canal de Integraciones (API) de Tiendanube (`api@tiendanube.com`):
-1. Instrucciones para registrar correctamente la URL pública de producción de tu `index.global.js` (ej. `https://assets.zerocart.app/checkout/index.global.js`) en la configuración del Partner Portal.
-2. Identificación exacta del árbol de propiedades (ej. `state.cart.id` vs `state.order.id`) que el partner debe usar de forma canónica para identificar un Pedido Finalizado de forma inequívoca en la fase `success`.
-3. Herramientas o ambientes (sandboxes de testing locales) recomendados para emular el *location:updated* del Checkout V3 sin tener que pagar pedidos reales en producción.
+### 7.1. Registro de la Extensión (Partner Portal)
+Para que Tiendanube reconozca y ejecute el script dentro del entorno seguro de Web Workers, **no se usa la API de inyección tradicional**, sino la interfaz gráfica del **Partner Portal**:
+
+1. Ingresa a la Configuración de tu App en el Partner Portal.
+2. Ve a la sección de **Scripts**.
+3. Ingresa la URL (ya sea de desarrollo local o producción en tu backend).
+4. **CRÍTICO:** Debes marcar expresamente la opción **"Usa NubeSDK"**. Sin esta opción (flag), el script fallará porque será inyectado de la forma antigua (en el DOM) en lugar del sandbox del Web Worker.
+5. El servidor que aloje el archivo (tu backend) debe tener `HTTPS` y sus cabeceras **CORS** correctamente configuradas.
+
+### 7.2. Herramientas de Testeo Local / Sandbox
+Para desarrollar iterativamente sin necesidad de publicar a la URL real ni hacer compras reales, el flujo de desarrollo oficial de Tiendanube recomienda:
+
+1. **URL Local:** En el Partner Portal, puedes registrar una URL local (ej: `http://localhost:8080/index.global.js`).
+2. **Nube DevTools:** Se debe instalar la extensión de Chrome **Nube DevTools**. Esta extensión es mandatoria ya que permite visualizar todos los eventos (como `cart:update`, `location:updated`) y el `NubeSDKState` en tiempo real.
+3. Permite hacer pruebas de flujo (Checkout de Prueba o pago manual "A convenir") en la Tienda de Prueba del Partner sin tarjetas de crédito.
+
+### 7.3. Identificador Canónico (Order ID)
+En el ecosistema de Tiendanube SDK, el estado (`NubeSDKState`) **no cuenta con un objeto `state.order.id` en el paso 'success'**. 
+
+La referencia **canónica, oficial y correcta** para asociar una compra generada desde el frontend es siempre **`state.cart.id`**. Este ID de carrito es el que luego figurará en los webhooks de "Orden Creada" que recibirá nuestro backend. No debe ser tratado como un "fallback", sino como el Primary Key válido y definitivo desde la perspectiva del cliente que navega el checkout.

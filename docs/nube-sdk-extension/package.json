@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@tiendanube/nube-sdk-jsx": "^0.16.0",
     "@tiendanube/nube-sdk-types": "^0.57.0",

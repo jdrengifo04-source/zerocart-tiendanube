@@ -2,9 +2,10 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
     entry: ['src/index.tsx'],
-    format: ['iife'],
-    globalName: 'ZeroCartExtension',
+    format: ['esm'],
     minify: true,
     clean: true,
-    noExternal: [/(.*)/] // bundle everything
+    bundle: true,
+    noExternal: [/(.*)/], // bundle everything
+    outExtension: () => ({ js: '.global.js' })
 });
