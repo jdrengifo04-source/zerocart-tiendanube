@@ -93,20 +93,32 @@ const handleState = (state: any) => {
     }
 };
 
-// 1. Listen for navigation changes (for eventual single-page navigations)
-nube.on("location:updated", async (eventData: any) => {
-    console.log("[ZeroCart] location:updated event received:", eventData);
-    const state = eventData?.state || (nube as any).getState?.();
-    handleState(state);
-});
-
-// 2. Immediately evaluate current state on initial load
 try {
-    const initialState = (nube as any).getState?.();
-    console.log("[ZeroCart] Initial state fetched synchronously:", initialState);
-    if (initialState) {
-        handleState(initialState);
+    console.log("[ZeroCart] Checking SDK setup. Is 'nube' defined?", typeof nube !== "undefined");
+    if (typeof nube === "undefined") {
+        console.warn("[ZeroCart] 'nube' is undefined in this context! Global keys:", Object.keys(self));
+        // We can't proceed if nube is missing, but maybe it's passed via some other variable
+    } else {
+        console.log("[ZeroCart] 'nube' methods available:", Object.keys(nube));
+
+        // 1. Listen for navigation changes (for eventual single-page navigations)
+        nube.on("location:updated", async (eventData: any) => {
+            try {
+                console.log("[ZeroCart] location:updated event received:", eventData);
+                const state = eventData?.state || (nube as any).getState?.();
+                handleState(state);
+            } catch (err) {
+                console.error("[ZeroCart] Error inside location:updated handler:", err);
+            }
+        });
+
+        // 2. Immediately evaluate current state on initial load
+        const initialState = (nube as any).getState?.();
+        console.log("[ZeroCart] Initial state fetched synchronously:", initialState);
+        if (initialState) {
+            handleState(initialState);
+        }
     }
 } catch (e) {
-    console.warn("[ZeroCart] Error fetching initial state directly:", e);
+    console.error("[ZeroCart] CRITICAL ERROR during SDK registration:", e);
 }
