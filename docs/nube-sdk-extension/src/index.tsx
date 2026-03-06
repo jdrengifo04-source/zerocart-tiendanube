@@ -36,7 +36,7 @@ nube.on("location:updated", async (eventData: any) => {
         ));
 
         try {
-            const response = await fetch(`https://api.zerocart.app/api/order/details?cart_id=${orderIdentifier}&store_id=${storeId}`);
+            const response = await fetch(`https://zerocart.jrengifo.com/api/order/details?cart_id=${orderIdentifier}&store_id=${storeId}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch order details.");
             }
