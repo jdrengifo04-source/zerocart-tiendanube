@@ -27,6 +27,7 @@ export function App(nube: NubeSDK) {
                 background: "surface",
                 borderRadius: "24px",
                 width: "100%",
+                direction: "col",
                 style: {
                     marginTop: "32px",
                     marginBottom: "32px",
@@ -35,7 +36,9 @@ export function App(nube: NubeSDK) {
                     maxWidth: "448px",
                     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                     border: "1px solid #f3f4f6",
-                    overflow: "hidden" as any
+                    overflow: "hidden" as any,
+                    display: "flex",
+                    flexDirection: "column"
                 },
                 children: [
                     // Header section
@@ -47,18 +50,25 @@ export function App(nube: NubeSDK) {
                             paddingBottom: "24px",
                             paddingLeft: "32px",
                             paddingRight: "32px",
+                            display: "flex",
+                            flexDirection: "column"
                         },
                         children: [
                             {
                                 type: "box",
                                 background: "#f0fdf4", // bg-green-50
                                 borderRadius: "100px",
+                                direction: "col",
                                 style: {
                                     marginBottom: "16px",
                                     paddingTop: "12px",
                                     paddingBottom: "12px",
                                     paddingLeft: "12px",
                                     paddingRight: "12px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center"
                                 },
                                 children: [
                                     { type: "icon", name: "check-circle", color: "#10b981", size: "64px" }
@@ -93,6 +103,8 @@ export function App(nube: NubeSDK) {
                             paddingBottom: "32px",
                             paddingLeft: "32px",
                             paddingRight: "32px",
+                            display: "flex",
+                            flexDirection: "column"
                         },
                         children: [
                             productImage ? {
@@ -100,10 +112,13 @@ export function App(nube: NubeSDK) {
                                 width: "192px",
                                 height: "192px",
                                 borderRadius: "16px",
+                                direction: "col",
                                 style: {
                                     marginBottom: "24px",
                                     boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                                    overflow: "hidden" as any
+                                    overflow: "hidden" as any,
+                                    display: "flex",
+                                    flexDirection: "column"
                                 },
                                 children: [
                                     {
@@ -121,9 +136,11 @@ export function App(nube: NubeSDK) {
                                 height: "192px",
                                 background: "#3b82f6",
                                 borderRadius: "16px",
+                                direction: "col",
                                 style: {
                                     marginBottom: "24px",
                                     display: "flex",
+                                    flexDirection: "column",
                                     alignItems: "center",
                                     justifyContent: "center"
                                 },
@@ -141,11 +158,15 @@ export function App(nube: NubeSDK) {
                                 type: "box",
                                 background: "#dcfce7", // bg-green-100
                                 borderRadius: "100px",
+                                direction: "col",
                                 style: {
                                     paddingTop: "4px",
                                     paddingBottom: "4px",
                                     paddingLeft: "12px",
                                     paddingRight: "12px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center"
                                 },
                                 children: [
                                     {
@@ -160,10 +181,13 @@ export function App(nube: NubeSDK) {
                     // Action Section
                     {
                         type: "box",
+                        direction: "col",
                         style: {
                             paddingLeft: "32px",
                             paddingRight: "32px",
                             paddingBottom: "16px",
+                            display: "flex",
+                            flexDirection: "column"
                         },
                         children: [
                             {
@@ -195,17 +219,21 @@ export function App(nube: NubeSDK) {
                     {
                         type: "box",
                         background: "#f9fafb", // bg-gray-50/50
+                        direction: "col",
                         style: {
                             borderTop: "1px solid #f3f4f6",
                             paddingTop: "24px",
                             paddingBottom: "24px",
                             paddingLeft: "24px",
                             paddingRight: "24px",
+                            display: "flex",
+                            flexDirection: "column"
                         },
                         children: [
                             {
                                 type: "box",
                                 background: "rgba(254, 249, 195, 0.4)", // bg-tip-yellow/40
+                                direction: "col",
                                 style: {
                                     border: "1px solid #fef3c7",
                                     borderRadius: "12px",
@@ -213,6 +241,8 @@ export function App(nube: NubeSDK) {
                                     paddingBottom: "16px",
                                     paddingLeft: "16px",
                                     paddingRight: "16px",
+                                    display: "flex",
+                                    flexDirection: "column"
                                 },
                                 children: [
                                     {
