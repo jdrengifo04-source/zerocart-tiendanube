@@ -36,7 +36,15 @@ export const getOrderDetails = async (req: Request, res: Response) => {
 
         // 3. Verificar que el pedido esté pago
         // Tiendanube usa 'paid' para status y payment_status
-        const isPaid = order.status === 'paid' || order.payment_status === 'paid' || order.payment_status === 'approved';
+        // NOTA: Temporalmente permitimos 'pending' y 'authorized' para pruebas con "pago a convenir" 
+        // desde la extensión del checkout, ya que sino no podríamos ver los links rápidamente.
+        const isPaid =
+            order.status === 'paid' ||
+            order.payment_status === 'paid' ||
+            order.payment_status === 'approved' ||
+            order.payment_status === 'pending' ||
+            order.payment_status === 'authorized' ||
+            order.status === 'open'; // Para carritos abandonados que se recuperan o pedidos manuales
 
         if (!isPaid) {
             console.warn(`⚠️ Pedido #${order.id} (Cart: ${cart_id}) no está marcado como pago. Status: ${order.status}, Payment: ${order.payment_status}`);

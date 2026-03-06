@@ -1,124 +1,134 @@
 import type { NubeSDK } from "@tiendanube/nube-sdk-types";
-import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx";
+import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx"; // Removed NubeSDK from this import as it's a type, not a component
 
-// Import nube from global context (injected by Web Worker sandbox)
-declare const nube: NubeSDK;
+/**
+ * [ZeroCart] NubeSDK Checkout Extension
+ * 
+ * Note: Tiendanube Checkout V3 scripts run in a sandboxed Web Worker.
+ * The 'nube' object is the primary interface.
+ */
 
-console.log("[ZeroCart] 🚀 index.global.js IIFE loaded and executing...");
+// We define the main logic in a way that it can be invoked manually or automatically
+const initZeroCartExtension = (injectedNube: any) => {
+    console.log("[ZeroCart] 🚀 Extension initialization sequence started.");
 
-const renderContent = async (orderIdentifier: string, storeId: string) => {
-    // Render a loading state first
-    nube.render("after_main_content", (
-        <Box padding="16px" background="surfaceSecondary">
-            <Text modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
-        </Box>
-    ));
+    // 1. DISCOVER THE SDK OBJECT
+    // We check multiple sources because injection methods vary by environment
+    const sdk: NubeSDK = injectedNube || (globalThis as any).nube || (self as any).nube;
 
-    try {
-        const response = await fetch(`https://zerocart.jrengifo.com/api/order/details?cart_id=${orderIdentifier}&store_id=${storeId}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch order details. Status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("[ZeroCart] Order metadata fetched successfully", data);
-
-        if (data && data.products && data.products.length > 0) {
-            nube.render("after_main_content", (
-                <Box padding="16px" background="surfaceSuccess">
-                    <Text modifiers={["bold"]}>
-                        {data.config?.headline || "¡Aquí tienes tus productos digitales!"}
-                    </Text>
-                    <Box margin="8px">
-                        <Text>
-                            {data.config?.message || "Haz clic en el enlace de abajo para acceder a tus archivos de Google Drive asociados a esta compra."}
-                        </Text>
-                    </Box>
-
-                    {data.products.map((product: any) => (
-                        <Box key={product.id} margin="8px">
-                            <Link href={product.googleDriveLink} variant="primary" target="_blank">
-                                Descargar {product.name}
-                            </Link>
-                        </Box>
-                    ))}
-                </Box>
-            ));
-        } else {
-            nube.render("after_main_content", (
-                <Box padding="16px" background="surfaceSuccess">
-                    <Text>
-                        Tus archivos digitales (si aplicables) estarán disponibles pronto en tu correo electrónico.
-                    </Text>
-                </Box>
-            ));
-        }
-    } catch (error) {
-        console.error("[ZeroCart] Error fetching drive URL:", error);
-        nube.render("after_main_content", (
-            <Box padding="16px" background="surfaceError">
-                <Text>
-                    Hubo un problema al cargar el enlace, revisa tu correo electrónico para obtener los archivos.
-                </Text>
-            </Box>
-        ));
-    }
-};
-
-const handleState = (state: any) => {
-    if (!state) {
-        console.warn("[ZeroCart] No state provided to handleState");
+    if (!sdk) {
+        console.warn("[ZeroCart] ❌ SDK Object 'nube' NOT found in scope!");
+        console.log("[ZeroCart] Global keys available in this worker:", Object.keys(self));
         return;
     }
 
-    const { location, cart, store } = state;
-    console.log("[ZeroCart] Current page type:", location?.page?.type, "| Current step:", location?.page?.data?.step);
+    console.log("[ZeroCart] ✅ SDK Object 'nube' found. Methods:", Object.keys(sdk));
 
-    if (
-        location?.page?.type === "checkout" &&
-        location?.page?.data?.step === "success"
-    ) {
-        // We are on the Thank You page.
-        const orderIdentifier = cart?.id;
-        const storeId = store?.id;
+    const renderContent = async (orderId: string, storeId: string) => {
+        console.log("[ZeroCart] Rendering content for order:", orderId);
 
-        if (orderIdentifier && storeId) {
-            console.log("[ZeroCart] On success page, starting renderContent for order:", orderIdentifier);
-            renderContent(orderIdentifier, storeId);
-        } else {
-            console.warn("[ZeroCart] Missing orderIdentifier or storeId in cart/store data");
+        // Show loading state
+        sdk.render("after_main_content", (
+            <Box padding="16px" background="surfaceSecondary">
+                <Text modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
+            </Box>
+        ));
+
+        try {
+            const response = await fetch(
+                `https://zerocart.jrengifo.com/api/order/details?cart_id=${orderId}&store_id=${storeId}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch order details. Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("[ZeroCart] Order metadata fetched successfully", data);
+
+            if (data && data.products && data.products.length > 0) {
+                sdk.render("after_main_content", (
+                    <Box padding="16px" background="surfaceSuccess">
+                        <Text modifiers={["bold"]}>{data.config?.headline || "¡Aquí tienes tus productos digitales!"}</Text>
+                        <Box margin="8px">
+                            <Text>{data.config?.message || "Haz clic en el enlace de abajo para acceder a tus archivos de Google Drive asociados a esta compra."}</Text>
+                        </Box>
+                        {data.products.map((p: any) => (
+                            <Box key={p.id} margin="8px">
+                                <Link href={p.googleDriveLink} variant="primary" target="_blank">
+                                    Descargar {p.name}
+                                </Link>
+                            </Box>
+                        ))}
+                    </Box>
+                ));
+            } else {
+                sdk.render("after_main_content", (
+                    <Box padding="16px" background="surfaceSuccess">
+                        <Text>Tus archivos digitales (si aplicables) estarán disponibles pronto en tu correo electrónico.</Text>
+                    </Box>
+                ));
+            }
+        } catch (error) {
+            console.error("[ZeroCart] Error fetching drive URL:", error);
+            sdk.render("after_main_content", (
+                <Box padding="16px" background="surfaceError">
+                    <Text>Hubo un problema al cargar el enlace, revisa tu correo electrónico para obtener los archivos.</Text>
+                </Box>
+            ));
         }
-    } else {
-        // Clear the slot if we navigate away from the success step
-        nube.render("after_main_content", []);
-    }
-};
+    };
 
-try {
-    console.log("[ZeroCart] Checking SDK setup. Is 'nube' defined?", typeof nube !== "undefined");
-    if (typeof nube === "undefined") {
-        console.warn("[ZeroCart] 'nube' is undefined in this context! Global keys:", Object.keys(self));
-        // We can't proceed if nube is missing, but maybe it's passed via some other variable
-    } else {
-        console.log("[ZeroCart] 'nube' methods available:", Object.keys(nube));
+    const handleState = (state: any) => {
+        if (!state) {
+            console.warn("[ZeroCart] No state provided to handleState");
+            return;
+        }
 
-        // 1. Listen for navigation changes (for eventual single-page navigations)
-        nube.on("location:updated", async (eventData: any) => {
+        const { location, cart, store } = state;
+        console.log("[ZeroCart] Current page:", location?.page?.type, "| step:", location?.page?.data?.step);
+
+        if (location?.page?.type === "checkout" && location?.page?.data?.step === "success") {
+            const orderId = cart?.id;
+            const storeId = store?.id;
+
+            if (orderId && storeId) {
+                renderContent(orderId, storeId);
+            } else {
+                console.warn("[ZeroCart] Missing orderIdentifier or storeId in cart/store data");
+            }
+        } else {
+            // Clear if not on success page
+            sdk.render("after_main_content", []);
+        }
+    };
+
+    // 2. REGISTER LISTENERS
+    try {
+        sdk.on("location:updated", (state, event) => {
             try {
-                console.log("[ZeroCart] location:updated event received:", eventData);
-                const state = eventData?.state || (nube as any).getState?.();
+                console.log("[ZeroCart] 📍 location:updated event received:", event);
                 handleState(state);
-            } catch (err) {
-                console.error("[ZeroCart] Error inside location:updated handler:", err);
+            } catch (e) {
+                console.error("[ZeroCart] Error inside location:updated handler:", e);
             }
         });
 
-        // 2. Immediately evaluate current state on initial load
-        const initialState = (nube as any).getState?.();
-        console.log("[ZeroCart] Initial state fetched synchronously:", initialState);
-        if (initialState) {
-            handleState(initialState);
-        }
+        // 3. INITIAL CHECK (in case we loaded after the event)
+        const initialState = sdk.getState?.();
+        console.log("[ZeroCart] Initial state fetched:", initialState);
+        if (initialState) handleState(initialState);
+
+    } catch (err) {
+        console.error("[ZeroCart] ❌ CRITICAL ERROR during SDK registration:", err);
     }
-} catch (e) {
-    console.error("[ZeroCart] CRITICAL ERROR during SDK registration:", e);
+};
+
+// AUTO-EXECUTE as IIFE
+// We pass 'nube' if it exists globally to the wrapper
+console.log("[ZeroCart] 🛠️ Script parsing started...");
+try {
+    initZeroCartExtension((globalThis as any).nube || (self as any).nube);
+} catch (outerError) {
+    console.error("[ZeroCart] 💀 Fatal crash in IIFE wrapper:", outerError);
 }

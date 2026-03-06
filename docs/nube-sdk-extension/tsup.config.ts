@@ -3,9 +3,17 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
     entry: ['src/index.tsx'],
     format: ['iife'],
-    target: 'es2020',
+    globalName: 'NubeSDKCheckoutExtension',
+    outExtension() {
+        return {
+            js: '.global.js',
+        }
+    },
     clean: true,
-    minify: true, // Tiendanube recommends minifying
-    sourcemap: false,
-    outExtension: () => ({ js: '.global.js' }),
+    dts: false,
+    minify: true,
+    platform: 'browser',
+    noExternal: [/.*/], // Bundle all dependencies
+    treeshake: true,
+    replaceNodeEnv: true,
 });
