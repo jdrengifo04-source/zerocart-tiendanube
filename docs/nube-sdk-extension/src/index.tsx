@@ -19,93 +19,139 @@ export function App(nube: NubeSDK) {
         const productName = mainItem?.name || "Tu Producto Digital";
         const productImage = mainItem?.thumbnail || "";
 
-        console.log(`[ZeroCart] 🎨 Rendering Premium UI for ${productName}`);
+        console.log(`[ZeroCart] 🎨 Rendering Premium UI v26 for ${productName}`);
 
         nube.render("after_header" as any, [
             {
                 type: "box",
-                padding: "32px",
                 background: "surface",
-                borderRadius: "16px",
+                borderRadius: "24px",
+                width: "100%",
                 style: {
-                    marginTop: "24px",
-                    marginBottom: "24px",
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                    border: "1px solid #E5E7EB",
+                    marginTop: "32px",
+                    marginBottom: "32px",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    maxWidth: "448px",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                    border: "1px solid #f3f4f6",
+                    overflow: "hidden" as any
                 },
                 children: [
-                    // Header Section
+                    // Header section
                     {
-                        type: "row",
+                        type: "col",
                         alignItems: "center",
-                        gap: "12px",
-                        style: { marginBottom: "24px" },
-                        children: [
-                            { type: "icon", name: "check-circle", color: "#10B981", size: "32px" },
-                            {
-                                type: "col",
-                                children: [
-                                    {
-                                        type: "txt",
-                                        children: "¡Tu compra ha sido aprobada!",
-                                        modifiers: ["bold"],
-                                        style: { fontSize: "24px", color: "#111827" }
-                                    },
-                                    {
-                                        type: "txt",
-                                        children: "Gracias por confiar en ZeroCart.",
-                                        style: { fontSize: "16px", color: "#6B7280" }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    // Product Display Section
-                    {
-                        type: "box",
-                        padding: "20px",
-                        background: "#F9FAFB",
-                        borderRadius: "12px",
                         style: {
-                            marginBottom: "24px",
-                            border: "1px dashed #D1D5DB"
+                            paddingTop: "40px",
+                            paddingBottom: "24px",
+                            paddingLeft: "32px",
+                            paddingRight: "32px",
                         },
                         children: [
                             {
-                                type: "row",
-                                alignItems: "center",
-                                gap: "16px",
+                                type: "box",
+                                background: "#f0fdf4", // bg-green-50
+                                borderRadius: "100px",
+                                style: {
+                                    marginBottom: "16px",
+                                    paddingTop: "12px",
+                                    paddingBottom: "12px",
+                                    paddingLeft: "12px",
+                                    paddingRight: "12px",
+                                },
                                 children: [
-                                    productImage ? {
+                                    { type: "icon", name: "check-circle", color: "#10b981", size: "64px" }
+                                ]
+                            },
+                            {
+                                type: "txt",
+                                children: "¡Tu compra ha sido aprobada!",
+                                modifiers: ["bold"],
+                                style: { fontSize: "30px", color: "#1e293b", textAlign: "center", lineHeight: "1.2" }
+                            },
+                            {
+                                type: "txt",
+                                children: "Gracias por confiar en ZeroCart.",
+                                style: { fontSize: "16px", color: "#64748b", marginTop: "8px", textAlign: "center" }
+                            }
+                        ]
+                    },
+                    // Divider
+                    {
+                        type: "box",
+                        height: "1px",
+                        background: "#f3f4f6",
+                        style: { marginLeft: "32px", marginRight: "32px" }
+                    },
+                    // Product View
+                    {
+                        type: "col",
+                        alignItems: "center",
+                        style: {
+                            paddingTop: "32px",
+                            paddingBottom: "32px",
+                            paddingLeft: "32px",
+                            paddingRight: "32px",
+                        },
+                        children: [
+                            productImage ? {
+                                type: "box",
+                                width: "192px",
+                                height: "192px",
+                                borderRadius: "16px",
+                                style: {
+                                    marginBottom: "24px",
+                                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                                    overflow: "hidden" as any
+                                },
+                                children: [
+                                    {
                                         type: "img",
                                         src: productImage,
-                                        alt: productName,
-                                        width: "80px",
-                                        height: "80px",
-                                        style: { borderRadius: "8px", objectFit: "cover" as any }
-                                    } : {
-                                        type: "box",
-                                        width: "80px",
-                                        height: "80px",
-                                        background: "#E5E7EB",
-                                        borderRadius: "8px",
-                                        children: []
-                                    },
+                                        alt: productName || "Producto",
+                                        width: "100%",
+                                        height: "100%",
+                                        style: { objectFit: "cover" as any }
+                                    }
+                                ]
+                            } : {
+                                type: "box",
+                                width: "192px",
+                                height: "192px",
+                                background: "#3b82f6",
+                                borderRadius: "16px",
+                                style: {
+                                    marginBottom: "24px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                },
+                                children: [
+                                    { type: "txt", children: "Z", style: { fontSize: "80px", color: "white", fontWeight: "900" } }
+                                ]
+                            },
+                            {
+                                type: "txt",
+                                children: productName,
+                                modifiers: ["bold"],
+                                style: { fontSize: "24px", color: "#1e293b", marginBottom: "4px" }
+                            },
+                            {
+                                type: "box",
+                                background: "#dcfce7", // bg-green-100
+                                borderRadius: "100px",
+                                style: {
+                                    paddingTop: "4px",
+                                    paddingBottom: "4px",
+                                    paddingLeft: "12px",
+                                    paddingRight: "12px",
+                                },
+                                children: [
                                     {
-                                        type: "col",
-                                        children: [
-                                            {
-                                                type: "txt",
-                                                children: productName,
-                                                modifiers: ["bold"],
-                                                style: { fontSize: "18px", color: "#1F2937" }
-                                            },
-                                            {
-                                                type: "txt",
-                                                children: "Listo para descargar",
-                                                style: { fontSize: "14px", color: "#10B981" }
-                                            }
-                                        ]
+                                        type: "txt",
+                                        children: " Listo para descargar",
+                                        style: { fontSize: "14px", color: "#15803d", fontWeight: "600" }
                                     }
                                 ]
                             }
@@ -113,25 +159,31 @@ export function App(nube: NubeSDK) {
                     },
                     // Action Section
                     {
-                        type: "row",
-                        alignItems: "center",
-                        gap: "16px",
+                        type: "box",
+                        style: {
+                            paddingLeft: "32px",
+                            paddingRight: "32px",
+                            paddingBottom: "16px",
+                        },
                         children: [
                             {
                                 type: "link",
                                 href: `https://zerocart.jrengifo.com/download/${cartId}`,
                                 variant: "primary",
                                 style: {
-                                    paddingLeft: "32px",
-                                    paddingRight: "32px",
+                                    width: "100%",
                                     paddingTop: "16px",
                                     paddingBottom: "16px",
-                                    borderRadius: "10px",
+                                    paddingLeft: "16px",
+                                    paddingRight: "16px",
+                                    borderRadius: "16px",
+                                    background: "#3b82f6",
+                                    color: "white",
                                     fontWeight: "700",
                                     fontSize: "18px",
-                                    background: "#3B82F6",
-                                    color: "white",
-                                    textAlign: "center"
+                                    textAlign: "center",
+                                    boxShadow: "0 10px 15px -3px rgba(59, 130, 246, 0.3)",
+                                    display: "block"
                                 },
                                 children: [
                                     "Descargar Ahora"
@@ -139,22 +191,47 @@ export function App(nube: NubeSDK) {
                             }
                         ]
                     },
-                    // Reminder Section
+                    // Tip Section
                     {
                         type: "box",
-                        padding: "12px",
-                        borderRadius: "8px",
-                        background: "#FEF3C7",
-                        style: { marginTop: "24px" },
+                        background: "#f9fafb", // bg-gray-50/50
+                        style: {
+                            borderTop: "1px solid #f3f4f6",
+                            paddingTop: "24px",
+                            paddingBottom: "24px",
+                            paddingLeft: "24px",
+                            paddingRight: "24px",
+                        },
                         children: [
                             {
-                                type: "txt",
-                                children: "💡 Consejo: Guarda esta página en tus marcadores para acceder a tu descarga más tarde.",
-                                style: { fontSize: "13px", color: "#92400E", textAlign: "center" }
+                                type: "box",
+                                background: "rgba(254, 249, 195, 0.4)", // bg-tip-yellow/40
+                                style: {
+                                    border: "1px solid #fef3c7",
+                                    borderRadius: "12px",
+                                    paddingTop: "16px",
+                                    paddingBottom: "16px",
+                                    paddingLeft: "16px",
+                                    paddingRight: "16px",
+                                },
+                                children: [
+                                    {
+                                        type: "row",
+                                        gap: "12px",
+                                        children: [
+                                            { type: "txt", children: "💡", style: { fontSize: "18px" } },
+                                            {
+                                                type: "txt",
+                                                children: "Consejo: Guarda esta página en tus marcadores para acceder a tu descarga más tarde.",
+                                                style: { fontSize: "14px", color: "#854d0e", lineHeight: "1.5" }
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
-                ]
+                ] as NubeComponent[]
             }
         ]);
     };

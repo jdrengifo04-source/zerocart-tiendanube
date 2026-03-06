@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirmación de Compra - ZeroCart</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'slate-dark': '#1e293b',
+            'blue-indigo': '#3b82f6',
+            'success-green': '#10b981',
+            'tip-yellow': '#fef9c3',
+            'tip-text': '#854d0e',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<!-- BEGIN: MainCardContainer -->
+<main class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100" data-purpose="receipt-card">
+<!-- BEGIN: SuccessHeader -->
+<header class="pt-10 pb-6 px-8 text-center flex flex-col items-center">
+<!-- Large Success Icon -->
+<div class="mb-4 bg-green-50 p-3 rounded-full" data-purpose="success-icon-container">
+<svg class="h-16 w-16 text-success-green" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<h1 class="text-3xl font-bold text-slate-dark tracking-tight">¡Tu compra ha sido aprobada!</h1>
+<p class="mt-2 text-slate-500 font-medium">Gracias por confiar en ZeroCart.</p>
+</header>
+<!-- END: SuccessHeader -->
+<hr class="border-gray-100 mx-8"/>
+<!-- BEGIN: ProductView -->
+<section class="py-8 px-8 flex flex-col items-center" data-purpose="product-details">
+<!-- Book Cover Image Placeholder -->
+<div class="w-48 h-48 bg-blue-600 rounded-2xl shadow-lg flex items-center justify-center mb-6 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+<span class="text-white text-8xl font-black select-none">Z</span>
+</div>
+<div class="text-center">
+<h2 class="text-2xl font-bold text-slate-dark mb-1">PDF de Gatos</h2>
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700">
+<span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+          Listo para descargar
+        </span>
+</div>
+</section>
+<!-- END: ProductView -->
+<!-- BEGIN: ActionSection -->
+<div class="px-8 pb-4">
+<button class="w-full bg-blue-indigo hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-colors duration-200 shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group" type="button">
+<svg class="h-6 w-6 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+        Descargar Ahora
+      </button>
+</div>
+<!-- END: ActionSection -->
+<!-- BEGIN: TipSection -->
+<footer class="p-6 bg-gray-50/50">
+<div class="bg-tip-yellow/40 border border-yellow-100 rounded-xl p-4 flex gap-3 items-start" data-purpose="save-tip-box">
+<span class="text-lg">💡</span>
+<p class="text-sm text-tip-text leading-relaxed">
+<strong>Consejo:</strong> Guarda esta página en tus marcadores para acceder a tu descarga más tarde.
+        </p>
+</div>
+<div class="mt-6 text-center">
+<p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Recibo #ZC-98442-2023</p>
+</div>
+</footer>
+<!-- END: TipSection -->
+</main>
+<!-- END: MainCardContainer -->
+</body></html>
