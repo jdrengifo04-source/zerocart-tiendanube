@@ -31,13 +31,14 @@ El proyecto es un monorepo simplificado:
 - ✅ Integración DB/API "1 Click $": Configuración guardada en PostgreSQL vía Prisma. Función de autoinyección del Script dinámico vía API de Tiendanube.
 - ✅ Redirección Directa a Checkout: Solucionado el error de carrito vacío mediante flujo AJAX al endpoint `/comprar/`, permitiendo redirección directa a la URL final de pago (`/checkout/v3/start/...`).
 - ✅ Permisos de Tiendanube configurados: Identificados y habilitados los alcances necesarios (Products, Scripts, Orders, Customers) para la próxima fase de Página de Gracias y Descarga de PDFs.
-- 🔄 (En curso) Implementación de flujo "Página de Gracias" vía NubeSDK (Checkout Extension V3) aislando React en un Web Worker.
+- ✅ Implementación de flujo "Página de Gracias" vía NubeSDK (Checkout Extension V3) aislando la lógica en un Web Worker usando el esquema estricto JSON.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
 
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)
 - [Solución Redirección One-Click](docs/ONE_CLICK_CHECKOUT.md)
+- [Arquitectura NubeSDK (Checkout V3 Web Worker)](docs/NUBESDK_ARCHITECTURE.md)
 - [Extensión Checkout V3 (NubeSDK)](docs/NUBE_SDK_EXTENSION.md)
 - [Guía de Despliegue y Ops](docs/DEPLOYMENT.md)
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)

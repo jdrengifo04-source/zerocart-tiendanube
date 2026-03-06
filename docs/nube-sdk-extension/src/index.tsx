@@ -1,13 +1,13 @@
 import type { NubeSDK } from "@tiendanube/nube-sdk-types";
 
 /**
- * [ZeroCart] NubeSDK Checkout Extension - Version 21
+ * [ZeroCart] NubeSDK Checkout Extension - Version 22
  * 
- * Strict Component JSON Structure based on @tiendanube/nube-sdk-types definitions.
+ * Strict Component JSON Structure + Top Slot Placement (before_main_content)
  */
 
 export function App(nube: NubeSDK) {
-    console.log("[ZeroCart] 🚀 Extension initialized (v21 - Strict JSON Components).");
+    console.log("[ZeroCart] 🚀 Extension initialized (v22 - Top Slot UI Polish).");
 
     if (!nube) {
         console.error("[ZeroCart] ❌ 'nube' object missing!");
@@ -15,15 +15,17 @@ export function App(nube: NubeSDK) {
     }
 
     let lastStep = "";
+    const renderSlot = "before_main_content"; // Changed to top slot for immediate visibility
 
     const renderContent = async (cartId: string, storeId: string) => {
         console.log("[ZeroCart] 💎 Rendering content for ID:", cartId);
 
         // Initial loading state
-        nube.render("after_main_content", [
+        nube.render(renderSlot, [
             {
                 type: "box",
-                padding: "16px",
+                padding: "24px",
+                margin: "16px",
                 background: "surfaceSecondary",
                 children: [
                     { type: "txt", children: "Cargando tu enlace de descarga..." }
@@ -39,10 +41,11 @@ export function App(nube: NubeSDK) {
             if (!response.ok) {
                 console.warn(`[ZeroCart] Fetch failed (${response.status})`);
                 if (response.status === 404) {
-                    nube.render("after_main_content", [
+                    nube.render(renderSlot, [
                         {
                             type: "box",
-                            padding: "16px",
+                            padding: "24px",
+                            margin: "16px",
                             background: "surfaceSecondary",
                             children: [
                                 { type: "txt", children: "Tu pedido digital se está procesando... revisa tu email en unos minutos." }
@@ -60,34 +63,35 @@ export function App(nube: NubeSDK) {
             if (data && data.products && data.products.length > 0) {
                 const productLinks = data.products.map((p: any) => ({
                     type: "box",
-                    margin: "8px",
+                    margin: "16px",
                     children: [
                         {
                             type: "link",
                             href: p.googleDriveLink,
                             variant: "primary",
                             target: "_blank",
-                            children: `Descargar ${p.name}`
+                            children: `⬇️ Descargar ${p.name}`
                         }
                     ]
                 }));
 
-                nube.render("after_main_content", [
+                nube.render(renderSlot, [
                     {
                         type: "box",
-                        padding: "16px",
-                        background: "surfaceSuccess",
+                        padding: "24px",
+                        margin: "16px",
+                        background: "surfaceSuccess", // Distinct background
                         children: [
                             {
                                 type: "txt",
-                                children: data.config?.headline || "¡Aquí tienes tus productos digitales!",
+                                children: data.config?.headline || "✅ ¡Aquí tienes tus productos digitales!",
                                 modifiers: ["bold"]
                             },
                             {
                                 type: "box",
                                 margin: "8px",
                                 children: [
-                                    { type: "txt", children: data.config?.message || "Haz clic abajo para acceder a tus archivos." }
+                                    { type: "txt", children: data.config?.message || "Haz clic en el botón de abajo para acceder a tus archivos." }
                                 ]
                             },
                             ...productLinks
@@ -95,10 +99,11 @@ export function App(nube: NubeSDK) {
                     }
                 ]);
             } else {
-                nube.render("after_main_content", [
+                nube.render(renderSlot, [
                     {
                         type: "box",
-                        padding: "16px",
+                        padding: "24px",
+                        margin: "16px",
                         background: "surfaceSecondary",
                         children: [
                             { type: "txt", children: "Tus archivos digitales estarán pronto en tu correo." }
@@ -108,13 +113,14 @@ export function App(nube: NubeSDK) {
             }
         } catch (error) {
             console.error("[ZeroCart] ❌ Render Error:", error);
-            nube.render("after_main_content", [
+            nube.render(renderSlot, [
                 {
                     type: "box",
-                    padding: "16px",
+                    padding: "24px",
+                    margin: "16px",
                     background: "surfaceError",
                     children: [
-                        { type: "txt", children: "Hubo un problema. Revisa tu email para los enlaces." }
+                        { type: "txt", children: "Hubo un problema procesando tu entrega. Revisa tu email para los enlaces." }
                     ]
                 }
             ]);
@@ -146,7 +152,7 @@ export function App(nube: NubeSDK) {
             }
         } else {
             if (pageType !== "checkout" || step !== "success") {
-                nube.render("after_main_content", []);
+                nube.render(renderSlot, []);
             }
         }
     };
