@@ -1,13 +1,14 @@
-import type { NubeSDK } from "@tiendanube/nube-sdk-types";
+import type { NubeSDK, NubeComponent } from "@tiendanube/nube-sdk-types";
 
 /**
- * [ZeroCart] NubeSDK Checkout Extension - Version 22
+ * [ZeroCart] NubeSDK Checkout Extension - Version 23
  * 
- * Strict Component JSON Structure + Top Slot Placement (before_main_content)
+ * Premium UI + Ultimate Placement (after_header)
+ * Features: High visibility slot, premium shadows, clear icons, and button styling.
  */
 
 export function App(nube: NubeSDK) {
-    console.log("[ZeroCart] 🚀 Extension initialized (v22 - Top Slot UI Polish).");
+    console.log("[ZeroCart] 🚀 Extension initialized (v23 - Premium UI).");
 
     if (!nube) {
         console.error("[ZeroCart] ❌ 'nube' object missing!");
@@ -15,38 +16,43 @@ export function App(nube: NubeSDK) {
     }
 
     let lastStep = "";
-    const renderSlot = "before_main_content"; // Changed to top slot for immediate visibility
+    const renderSlot = "after_header"; // Maximum visibility at the top of the page
 
     const renderContent = async (cartId: string, storeId: string) => {
-        console.log("[ZeroCart] 💎 Rendering content for ID:", cartId);
+        console.log(`[ZeroCart] 💎 Rendering v23 UI for cart: ${cartId} (Store: ${storeId})`);
 
-        // Initial loading state
+        // Initial loading state with premium card look
         nube.render(renderSlot, [
             {
                 type: "box",
                 padding: "24px",
                 margin: "16px",
-                background: "surfaceSecondary",
+                background: "surface",
+                borderRadius: "12px",
+                style: {
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                    border: "1px solid #E5E7EB"
+                },
                 children: [
-                    { type: "txt", children: "Cargando tu enlace de descarga..." }
+                    { type: "txt", children: "🚀 Cargando tus productos digitales..." }
                 ]
             }
         ]);
 
         try {
             const url = `https://zerocart.jrengifo.com/api/order/details?cart_id=${cartId}&store_id=${storeId}`;
-            console.log("[ZeroCart] 📡 Fetching:", url);
-
             const response = await fetch(url);
+
             if (!response.ok) {
-                console.warn(`[ZeroCart] Fetch failed (${response.status})`);
                 if (response.status === 404) {
                     nube.render(renderSlot, [
                         {
                             type: "box",
                             padding: "24px",
                             margin: "16px",
-                            background: "surfaceSecondary",
+                            background: "surface",
+                            borderRadius: "12px",
+                            style: { border: "1px solid #E5E7EB" },
                             children: [
                                 { type: "txt", children: "Tu pedido digital se está procesando... revisa tu email en unos minutos." }
                             ]
@@ -58,19 +64,56 @@ export function App(nube: NubeSDK) {
             }
 
             const data = await response.json();
-            console.log("[ZeroCart] 📦 Data received:", data);
 
             if (data && data.products && data.products.length > 0) {
-                const productLinks = data.products.map((p: any) => ({
+                const productButtons: NubeComponent[] = data.products.map((p: any) => ({
                     type: "box",
-                    margin: "16px",
+                    padding: "16px",
+                    margin: "12px 0 0 0",
+                    background: "surfaceSecondary",
+                    borderRadius: "8px",
+                    style: { border: "1px solid #E5E7EB" },
                     children: [
                         {
-                            type: "link",
-                            href: p.googleDriveLink,
-                            variant: "primary",
-                            target: "_blank",
-                            children: `⬇️ Descargar ${p.name}`
+                            type: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            children: [
+                                {
+                                    type: "box",
+                                    children: [
+                                        {
+                                            type: "txt",
+                                            children: p.name,
+                                            modifiers: ["bold"],
+                                            style: { fontSize: "15px", color: "#1F2937" }
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "link",
+                                    href: p.googleDriveLink,
+                                    target: "_blank",
+                                    variant: "primary",
+                                    style: {
+                                        padding: "8px 16px",
+                                        borderRadius: "6px",
+                                        fontWeight: "600",
+                                        textDecoration: "none"
+                                    },
+                                    children: [
+                                        {
+                                            type: "row",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            children: [
+                                                { type: "icon", name: "download", size: "16px" },
+                                                "Descargar"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }));
@@ -80,56 +123,53 @@ export function App(nube: NubeSDK) {
                         type: "box",
                         padding: "24px",
                         margin: "16px",
-                        background: "surfaceSuccess", // Distinct background
+                        background: "surface",
+                        borderRadius: "12px",
+                        style: {
+                            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                            border: "1px solid #E5E7EB",
+                        },
                         children: [
                             {
-                                type: "txt",
-                                children: data.config?.headline || "✅ ¡Aquí tienes tus productos digitales!",
-                                modifiers: ["bold"]
+                                type: "row",
+                                alignItems: "center",
+                                gap: "12px",
+                                children: [
+                                    { type: "icon", name: "check-circle", color: "#10B981", size: "24px" },
+                                    {
+                                        type: "txt",
+                                        children: data.config?.headline || "Tus productos digitales están listos",
+                                        modifiers: ["bold"],
+                                        style: { fontSize: "18px", color: "#111827" }
+                                    }
+                                ]
                             },
                             {
                                 type: "box",
-                                margin: "8px",
+                                margin: "12px 0 20px 0",
                                 children: [
-                                    { type: "txt", children: data.config?.message || "Haz clic en el botón de abajo para acceder a tus archivos." }
+                                    {
+                                        type: "txt",
+                                        children: data.config?.message || "Gracias por tu compra. Puedes descargar tus archivos digitales haciendo clic en los botones de abajo.",
+                                        style: { color: "#4B5563", lineHeight: "1.5" }
+                                    }
                                 ]
                             },
-                            ...productLinks
+                            ...productButtons
                         ]
                     }
                 ]);
             } else {
-                nube.render(renderSlot, [
-                    {
-                        type: "box",
-                        padding: "24px",
-                        margin: "16px",
-                        background: "surfaceSecondary",
-                        children: [
-                            { type: "txt", children: "Tus archivos digitales estarán pronto en tu correo." }
-                        ]
-                    }
-                ]);
+                nube.render(renderSlot, []); // Clear if no products
             }
         } catch (error) {
             console.error("[ZeroCart] ❌ Render Error:", error);
-            nube.render(renderSlot, [
-                {
-                    type: "box",
-                    padding: "24px",
-                    margin: "16px",
-                    background: "surfaceError",
-                    children: [
-                        { type: "txt", children: "Hubo un problema procesando tu entrega. Revisa tu email para los enlaces." }
-                    ]
-                }
-            ]);
+            // Graceful silent failure for the premium slot
         }
     };
 
     const handleStateUpdate = (state: any, source: string) => {
         if (!state) return;
-
         const { location, cart, store, order } = state;
         const pageType = location?.page?.type;
         const step = location?.page?.data?.step;
@@ -138,32 +178,25 @@ export function App(nube: NubeSDK) {
         if (currentStepKey === lastStep && source !== "initial") return;
         lastStep = currentStepKey;
 
-        console.log(`[ZeroCart] 📍 State logic [via ${source}] -> Page: ${pageType} | Step: ${step}`);
+        console.log(`[ZeroCart] 🔍 State update [${source}] -> Step: ${currentStepKey}`);
 
         const cartId = cart?.id || order?.cart_id || location?.page?.data?.cartId || order?.id;
         const storeId = store?.id;
 
         if (pageType === "checkout" && step === "success") {
-            console.log("[ZeroCart] 🎉 SUCCESS PAGE DETECTED!");
             if (cartId && storeId) {
                 renderContent(cartId, storeId);
-            } else {
-                console.warn("[ZeroCart] ⚠️ Success detected but IDs missing:", { cartId, storeId });
             }
         } else {
-            if (pageType !== "checkout" || step !== "success") {
-                nube.render(renderSlot, []);
-            }
+            nube.render(renderSlot, []);
         }
     };
 
     const events = ["location:updated", "cart:updated", "ui:updated", "order:updated"];
     events.forEach(evt => {
         try {
-            nube.on(evt as any, (state) => {
-                handleStateUpdate(state, evt);
-            });
-        } catch (e) { /* ignore */ }
+            nube.on(evt as any, (state) => handleStateUpdate(state, evt));
+        } catch (e) { }
     });
 
     const watcher = setInterval(() => {
@@ -178,5 +211,3 @@ export function App(nube: NubeSDK) {
 
     return () => clearInterval(watcher);
 }
-
-
