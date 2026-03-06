@@ -88,6 +88,17 @@ Dado que estamos en un Web Worker, no podemos depender de librerías enormes que
 - **Dependencies:** **No debe haber dependencias pesadas**. Nada de `react` o `react-dom` en el bundle de salida. Todo el código de React pre-compilado fue removido a favor de crear los objetos de configuración puros (`type: "box"`).
 - **Archivo de Salida:** `index.global.js`. Este único archivo contenido alberga toda la lógica necesaria.
 
-## 5. Próximos Pasos (Phase 9 - UI Polish)
+## 5. Aprendizajes del Diseño Premium (v26.1)
 
-Sabiendo exactamente qué estructura espera el `nube.render`, el siguiente paso es mejorar el _layout_ provisto con los componentes internos y clases disponibles del NubeSDK (como tamaños de fuente, alertas condicionales o divisores) para hacer el llamado a la acción (descarga del PDF) inconfundible y altamente visible en la página de gracias.
+El desarrollo del diseño premium basado en tarjetas reveló comportamientos no documentados del motor de renderizado:
+
+1.  **Vertical Stacking (El gran "Gotcha"):** Por defecto, la raíz de `nube.render` o ciertos bloques `box` pueden intentar apilar elementos horizontalmente (estilo `row`). 
+    - **Solución:** Siempre especifica `direction: "col"` en los componentes contenedores.
+    - **Refuerzo:** Debido a variaciones entre el entorno de prueba y el checkout real, es recomendable inyectar estilos de flexbox directamente en la propiedad `style`:
+      ```javascript
+      style: { display: "flex", flexDirection: "column" }
+      ```
+2.  **Migración de Spacing:** Las propiedades aplanadas como `padding: "16px"` a veces son ignoradas si el componente es complejo. La forma más segura de garantizar el diseño es mover los márgenes y paddings al objeto `style`.
+3.  **Dynamic Update Pattern:** No intentes esperar a los datos para el primer renderizado. Inyecta la estructura básica (Placeholder) y usa una segunda llamada a `nube.render` dentro de la promesa del `fetch` para actualizar el contenido. El SDK maneja eficientemente el "diffing".
+
+🎉 **Estado:** La Fase 9 de pulido visual y la Fase 10 de descargas dinámicas han sido completadas exitosamente.

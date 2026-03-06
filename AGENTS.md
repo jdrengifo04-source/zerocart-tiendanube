@@ -31,9 +31,15 @@ El proyecto es un monorepo simplificado:
 - ✅ Integración DB/API "1 Click $": Configuración guardada en PostgreSQL vía Prisma. Función de autoinyección del Script dinámico vía API de Tiendanube.
 - ✅ Redirección Directa a Checkout: Solucionado el error de carrito vacío mediante flujo AJAX al endpoint `/comprar/`, permitiendo redirección directa a la URL final de pago (`/checkout/v3/start/...`).
 - ✅ Permisos de Tiendanube configurados: Identificados y habilitados los alcances necesarios (Products, Scripts, Orders, Customers) para la próxima fase de Página de Gracias y Descarga de PDFs.
-- ✅ Implementación de flujo "Página de Gracias" vía NubeSDK (Checkout Extension V3) aislando la lógica en un Web Worker usando el esquema estricto JSON.
+- ✅ **Premium Redesign v26.1 (Marzo 2026)**: Implementación de flujo "Página de Gracias" vía NubeSDK con diseño premium y descargas dinámicas desde el backend.
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
+
+### 💡 Aprendizajes Críticos (Quick Ref para el futuro)
+- **Layout Stacking (NubeSDK)**: Los contenedores `box` a veces apilan elementos horizontalmente por defecto. **Siempre** usa `direction: "col"` y refuerza con `display: "flex"`, `flexDirection: "column"` en el objeto `style`.
+- **Identificación de Tienda**: Usa `nube.getState().store.id` para obtener el ID de la tienda. Evita parsear `window.location`.
+- **Evitar Cache**: Al actualizar la extensión, usa versionado en el nombre del archivo (ej. `index.v26.1.js`) en lugar de sobrescribir el mismo, para evitar el cache del CDN. Esto es vital en Tiendanube.
+- **Async UI**: Inicia el renderizado con datos locales (placeholder) y actualiza con `nube.render` una vez que el `fetch` al backend resuelva los datos reales del producto.
 
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)

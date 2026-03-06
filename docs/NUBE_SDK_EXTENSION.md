@@ -108,3 +108,30 @@ Para desarrollar iterativamente sin necesidad de publicar a la URL real ni hacer
 En el ecosistema de Tiendanube SDK, el estado (`NubeSDKState`) **no cuenta con un objeto `state.order.id` en el paso 'success'**. 
 
 La referencia **canónica, oficial y correcta** para asociar una compra generada desde el frontend es siempre **`state.cart.id`**. Este ID de carrito es el que luego figurará en los webhooks de "Orden Creada" que recibirá nuestro backend. No debe ser tratado como un "fallback", sino como el Primary Key válido y definitivo desde la perspectiva del cliente que navega el checkout.
+
+## 8. Integración Dinámica de Descargas (v26.1)
+
+A partir de la versión 26.1, la extensión no muestra enlaces estáticos, sino que los recupera en tiempo real.
+
+### 8.1. El Endpoint de Detalle de Orden
+`GET https://zerocart.jrengifo.com/api/order/details?cart_id={cart_id}&store_id={store_id}`
+
+**Parámetros requeridos:**
+- `cart_id`: Obtenido de `nube.getState().cart.id`.
+- `store_id`: Obtenido de `nube.getState().store.id`. Es vital pasar ambos para asegurar multi-tenancy.
+
+### 8.2. Flujo de Renderizado Reactivo
+Dada la naturaleza del Web Worker, el flujo implementado es:
+1. **Initial Render**: Se llama a `nube.render` con datos genéricos ("Tu Producto Digital") para no dejar la pantalla vacía.
+2. **Async Fetch**: Se dispara la petición al backend.
+3. **Success Update**: Si el backend responde con un `googleDriveLink`, se llama de nuevo a `nube.render` con el enlace real.
+4. **Shadowing Prevention**: Importante usar variables locales (ej. `currentProductName`) para evitar conflictos con las variables extraídas del estado inicial del carrito.
+
+## 9. Estrategia de Versionado y Cache
+
+El CDN de Tiendanube y los navegadores modernos cachean agresivamente los scripts de extensión. 
+
+**Regla de Oro:** Si realizas cambios en el diseño o la lógica (especialmente en `index.tsx`), **NUNCA** sobrescribas el mismo archivo `index.v26.js`. 
+- Crea una nueva versión: `index.v26.1.js`, `index.v27.js`.
+- Actualiza la URL en el Portal de Partners.
+- Esto garantiza que el cambio sea instantáneo para todos los usuarios.

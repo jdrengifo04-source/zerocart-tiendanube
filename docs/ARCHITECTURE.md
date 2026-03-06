@@ -41,7 +41,14 @@ El modelo de datos se divide en:
 ### Modelo `Product`
 - `id`: ID único del producto en Tiendanube.
 - `storeId`: Referencia a su tienda dueña (Relación).
-- `googleDriveLink`: El recurso digital (PDF, link) a entregar cuando se concrete la compra.
+- `googleDriveLink`: El recurso digital (PDF, link) a entregar automáticamente.
+- `name`: Nombre descriptivo (cacheado).
+
+### 4. Flujo de Entrega Dinámica (v26.1)
+1. **Detección**: La extensión NubeSDK detecta que el usuario está en el paso `success` del checkout.
+2. **Petición**: Realiza un `fetch` a `GET /api/order/details?cart_id={cartId}&store_id={storeId}`.
+3. **Validación**: El backend busca el carrito, identifica los productos, y para cada uno busca el `googleDriveLink` en la tabla `Product`.
+4. **Visualización**: La extensión inyecta el diseño premium (v26.1) con el enlace recuperado.
 
 ## Manejo de Archivos Estáticos
 En producción, el backend sirve los archivos compilados del frontend (`client-dist`) y los scripts públicos (`public/scripts`). Esto permite que todo el sistema corra en un solo contenedor Docker.
