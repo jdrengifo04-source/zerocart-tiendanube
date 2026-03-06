@@ -1,6 +1,8 @@
 import { NubeSDK } from "@tiendanube/nube-sdk-types";
 import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx";
 
+console.log("[ZeroCart] 🚀 index.global.js ES Module loaded and evaluated by the browser!");
+
 export function App(nube: NubeSDK) {
     console.log("[ZeroCart] Extension App initialized successfully.");
 
