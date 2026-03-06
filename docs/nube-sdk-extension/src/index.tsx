@@ -124,31 +124,59 @@ const initZeroCartExtension = (injectedNube: any) => {
     }
 };
 
-// DIAGNOSTIC POLLING
-const pollForNube = (retries = 20) => {
-    const keys = Object.keys(self).join(", ");
-    console.log(`[ZeroCart] 🔍 Discovery Attempt (${21 - retries}): Keys: ${keys}`);
+// DEEP DIAGNOSTIC INSPECTION
+const runDeepDiagnostics = () => {
+    console.log("[ZeroCart] 🔎 DEEP DIAGNOSTIC START");
 
-    // @ts-ignore
-    const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube;
-
-    if (sdk) {
-        console.log("[ZeroCart] ✅ NubeSDK found via polling!");
-        initZeroCartExtension(sdk);
-    } else if (retries > 0) {
-        // Log keys every 4 attempts (1 second) to avoid flooding but keep track
-        if (retries % 4 === 0) {
-            console.log(`[ZeroCart] 🔍 Still searching... (Attempt ${21 - retries})`);
-        }
-        setTimeout(() => pollForNube(retries - 1), 250);
-    } else {
-        console.error("[ZeroCart] ❌ NubeSDK not found after polling. The environment might be missing the expected 'nube' global.");
+    // 1. Inspect __APP_DATA__ and __INITIAL_STATE__
+    try {
+        const appData = (self as any).__APP_DATA__;
+        const initialState = (self as any).__INITIAL_STATE__;
+        console.log("[ZeroCart] 📦 __APP_DATA__ Keys:", appData ? Object.keys(appData).join(", ") : "null");
+        console.log("[ZeroCart] 📦 __INITIAL_STATE__ Keys:", initialState ? Object.keys(initialState).join(", ") : "null");
+    } catch (e) {
+        console.warn("[ZeroCart] Failed to inspect internal data objects.");
     }
+
+    // 2. Intercept Message Events (Just in case it's injected via postMessage)
+    self.addEventListener("message", (event) => {
+        console.log("[ZeroCart] 📩 Message received in worker scope:", {
+            type: typeof event.data,
+            dataKeys: event.data && typeof event.data === 'object' ? Object.keys(event.data).join(", ") : "none"
+        });
+
+        // If message contains something that looks like an SDK
+        if (event.data && (event.data.nube || event.data.sdk)) {
+            console.log("[ZeroCart] 🌟 Potential SDK found in message event!");
+            initZeroCartExtension(event.data.nube || event.data.sdk);
+        }
+    });
+
+    // 3. Polling for globals
+    const poll = (retries = 20) => {
+        const keys = Object.keys(self).join(", ");
+        // Check for common aliases
+        const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube;
+
+        if (sdk) {
+            console.log("[ZeroCart] ✅ NubeSDK found via polling!");
+            initZeroCartExtension(sdk);
+        } else if (retries > 0) {
+            if (retries % 4 === 0) {
+                console.log(`[ZeroCart] 🔍 (Attempt ${21 - retries}) Keys in scope: ${keys}`);
+            }
+            setTimeout(() => poll(retries - 1), 250);
+        } else {
+            console.error("[ZeroCart] ❌ NubeSDK not found. Proveyendo esta lista de llaves al soporte.");
+        }
+    };
+
+    poll();
 };
 
 console.log("[ZeroCart] 🛠️ Script parsing started...");
 try {
-    pollForNube();
+    runDeepDiagnostics();
 } catch (outerError) {
-    console.error("[ZeroCart] 💀 Fatal crash during initial poll:", outerError);
+    console.error("[ZeroCart] 💀 Fatal crash during diagnostics:", outerError);
 }
