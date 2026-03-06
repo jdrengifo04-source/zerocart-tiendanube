@@ -2,8 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
     entry: ['src/index.tsx'],
-    format: ['iife'],
-    globalName: 'NubeSDKCheckoutExtension',
+    format: ['esm'],
     outExtension() {
         return {
             js: '.global.js',

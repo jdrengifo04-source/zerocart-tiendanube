@@ -4,31 +4,24 @@ import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx"; // Removed NubeSDK f
 /**
  * [ZeroCart] NubeSDK Checkout Extension
  * 
- * Note: Tiendanube Checkout V3 scripts run in a sandboxed Web Worker.
- * The 'nube' object is the primary interface.
+ * Official Entry Point: The platform expects an exported 'App' function.
+ * It injects the 'nube' SDK object directly as the first argument.
  */
+export function App(nube: NubeSDK) {
+    console.log("[ZeroCart] 🚀 Extension initialized via official App(nube) entry point.");
 
-// We define the main logic in a way that it can be invoked manually or automatically
-const initZeroCartExtension = (injectedNube: any) => {
-    console.log("[ZeroCart] 🚀 Extension initialization sequence started.");
-
-    // 1. DISCOVER THE SDK OBJECT
-    // We check multiple sources because injection methods vary by environment
-    const sdk: NubeSDK = injectedNube || (globalThis as any).nube || (self as any).nube;
-
-    if (!sdk) {
-        console.warn("[ZeroCart] ❌ SDK Object 'nube' NOT found in scope!");
-        console.log("[ZeroCart] Global keys available in this worker:", Object.keys(self));
+    if (!nube) {
+        console.error("[ZeroCart] ❌ App function called but 'nube' object is missing!");
         return;
     }
 
-    console.log("[ZeroCart] ✅ SDK Object 'nube' found. Methods:", Object.keys(sdk));
+    console.log("[ZeroCart] ✅ SDK Methods available:", Object.keys(nube));
 
     const renderContent = async (orderId: string, storeId: string) => {
         console.log("[ZeroCart] Rendering content for order:", orderId);
 
         // Show loading state
-        sdk.render("after_main_content", (
+        nube.render("after_main_content", (
             <Box padding="16px" background="surfaceSecondary">
                 <Text modifiers={["bold"]}>Cargando tu enlace de descarga...</Text>
             </Box>
@@ -47,7 +40,7 @@ const initZeroCartExtension = (injectedNube: any) => {
             console.log("[ZeroCart] Order metadata fetched successfully", data);
 
             if (data && data.products && data.products.length > 0) {
-                sdk.render("after_main_content", (
+                nube.render("after_main_content", (
                     <Box padding="16px" background="surfaceSuccess">
                         <Text modifiers={["bold"]}>{data.config?.headline || "¡Aquí tienes tus productos digitales!"}</Text>
                         <Box margin="8px">
@@ -63,7 +56,7 @@ const initZeroCartExtension = (injectedNube: any) => {
                     </Box>
                 ));
             } else {
-                sdk.render("after_main_content", (
+                nube.render("after_main_content", (
                     <Box padding="16px" background="surfaceSuccess">
                         <Text>Tus archivos digitales (si aplicables) estarán disponibles pronto en tu correo electrónico.</Text>
                     </Box>
@@ -71,7 +64,7 @@ const initZeroCartExtension = (injectedNube: any) => {
             }
         } catch (error) {
             console.error("[ZeroCart] Error fetching drive URL:", error);
-            sdk.render("after_main_content", (
+            nube.render("after_main_content", (
                 <Box padding="16px" background="surfaceError">
                     <Text>Hubo un problema al cargar el enlace, revisa tu correo electrónico para obtener los archivos.</Text>
                 </Box>
@@ -95,101 +88,28 @@ const initZeroCartExtension = (injectedNube: any) => {
             if (orderId && storeId) {
                 renderContent(orderId, storeId);
             } else {
-                console.warn("[ZeroCart] Missing orderIdentifier or storeId in cart/store data");
+                console.warn("[ZeroCart] Missing cart.id or store.id in state");
             }
         } else {
             // Clear if not on success page
-            sdk.render("after_main_content", []);
+            nube.render("after_main_content", []);
         }
     };
 
-    // 2. REGISTER LISTENERS
+    // Register event listener
     try {
-        sdk.on("location:updated", (state, event) => {
-            try {
-                console.log("[ZeroCart] 📍 location:updated event received:", event);
-                handleState(state);
-            } catch (e) {
-                console.error("[ZeroCart] Error inside location:updated handler:", e);
-            }
+        nube.on("location:updated", (state, event) => {
+            console.log("[ZeroCart] 📍 location:updated event received:", event);
+            handleState(state);
         });
 
-        // 3. INITIAL CHECK (in case we loaded after the event)
-        const initialState = sdk.getState?.();
+        // Initial check
+        const initialState = nube.getState?.();
         console.log("[ZeroCart] Initial state fetched:", initialState);
         if (initialState) handleState(initialState);
 
     } catch (err) {
-        console.error("[ZeroCart] ❌ CRITICAL ERROR during SDK registration:", err);
+        console.error("[ZeroCart] ❌ Error during NubeSDK event registration:", err);
     }
-};
-
-// DEEP DIAGNOSTIC INSPECTION - V13 (The "No stone left unturned" edition)
-const runDeepDiagnostics = () => {
-    console.log("[ZeroCart] 🔎 DEEP DIAGNOSTIC V13 START");
-
-    // 1. Inspect __APP_DATA__ and __INITIAL_STATE__
-    try {
-        const appData = (self as any).__APP_DATA__;
-        const initialState = (self as any).__INITIAL_STATE__;
-        console.log("[ZeroCart] 📦 __APP_DATA__:", JSON.stringify(appData, null, 2));
-        console.log("[ZeroCart] 📦 __INITIAL_STATE__ Keys:", initialState ? Object.keys(initialState).join(", ") : "null");
-
-        // Look inside appData
-        if (appData && (appData.nube || appData.sdk || appData.tiendanube)) {
-            console.log("[ZeroCart] 🌟 SDK found INSIDE __APP_DATA__!");
-            initZeroCartExtension(appData.nube || appData.sdk || appData.tiendanube);
-        }
-    } catch (e) {
-        console.warn("[ZeroCart] Failed to deep-inspect internal data objects.");
-    }
-
-    // 2. Intercept Message Events - Log content if it's a string
-    self.addEventListener("message", (event) => {
-        const data = event.data;
-        const type = typeof data;
-        let content = "unknown";
-
-        if (type === "string") content = data;
-        else if (type === "object") {
-            try { content = JSON.stringify(data); } catch { content = "[unserializable object]"; }
-        }
-
-        console.log(`[ZeroCart] 📩 Message received: [Type: ${type}] Content: ${content.substring(0, 200)}`);
-
-        if (data && (data.nube || data.sdk || data.tiendanube)) {
-            console.log("[ZeroCart] 🌟 SDK found in message event!");
-            initZeroCartExtension(data.nube || data.sdk || data.tiendanube);
-        }
-    });
-
-    // 3. Polling + Hidden Properties
-    const poll = (retries = 20) => {
-        // use getOwnPropertyNames to find hidden properties
-        const allKeys = Object.getOwnPropertyNames(self);
-        const sdkKey = allKeys.find(k => k.toLowerCase().includes("nube") || k.toLowerCase() === "sdk");
-
-        const sdk = (globalThis as any).nube || (self as any).nube || (self as any).sdk || (self as any).tiendanube || (sdkKey ? (self as any)[sdkKey] : null);
-
-        if (sdk) {
-            console.log(`[ZeroCart] ✅ SDK found! (Key: ${sdkKey || 'standard'})`);
-            initZeroCartExtension(sdk);
-        } else if (retries > 0) {
-            if (retries % 4 === 0) {
-                console.log(`[ZeroCart] 🔍 (Attempt ${21 - retries}) Keys in scope: ${allKeys.join(", ")}`);
-            }
-            setTimeout(() => poll(retries - 1), 250);
-        } else {
-            console.error("[ZeroCart] ❌ SDK not found. Ready for support email.");
-        }
-    };
-
-    poll();
-};
-
-console.log("[ZeroCart] 🛠️ Script parsing started (v13)...");
-try {
-    runDeepDiagnostics();
-} catch (outerError) {
-    console.error("[ZeroCart] 💀 Fatal crash:", outerError);
 }
+
