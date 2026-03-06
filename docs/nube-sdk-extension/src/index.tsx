@@ -1,5 +1,5 @@
 import type { NubeSDK } from "@tiendanube/nube-sdk-types";
-import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx"; // Removed NubeSDK from this import as it's a type, not a component
+import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx";
 
 /**
  * [ZeroCart] NubeSDK Checkout Extension
@@ -17,8 +17,8 @@ export function App(nube: NubeSDK) {
 
     console.log("[ZeroCart] ✅ SDK Methods available:", Object.keys(nube));
 
-    const renderContent = async (orderId: string, storeId: string) => {
-        console.log("[ZeroCart] Rendering content for order:", orderId);
+    const renderContent = async (cartId: string, storeId: string) => {
+        console.log("[ZeroCart] Rendering content for ID:", cartId);
 
         // Show loading state
         nube.render("after_main_content", (
@@ -28,11 +28,22 @@ export function App(nube: NubeSDK) {
         ));
 
         try {
-            const response = await fetch(
-                `https://zerocart.jrengifo.com/api/order/details?cart_id=${orderId}&store_id=${storeId}`
-            );
+            const url = `https://zerocart.jrengifo.com/api/order/details?cart_id=${cartId}&store_id=${storeId}`;
+            console.log("[ZeroCart] Fetching from:", url);
+
+            const response = await fetch(url);
 
             if (!response.ok) {
+                console.error(`[ZeroCart] Fetch failed. Status: ${response.status}`);
+                // If it's a 404, maybe it's not a digital product or order not yet linked
+                if (response.status === 404) {
+                    nube.render("after_main_content", (
+                        <Box padding="16px" background="surfaceSecondary">
+                            <Text>Procesando tu pedido digital... si no aparece en un momento, revisa tu email.</Text>
+                        </Box>
+                    ));
+                    return;
+                }
                 throw new Error(`Failed to fetch order details. Status: ${response.status}`);
             }
 
@@ -56,9 +67,10 @@ export function App(nube: NubeSDK) {
                     </Box>
                 ));
             } else {
+                console.log("[ZeroCart] No digital products found in response");
                 nube.render("after_main_content", (
-                    <Box padding="16px" background="surfaceSuccess">
-                        <Text>Tus archivos digitales (si aplicables) estarán disponibles pronto en tu correo electrónico.</Text>
+                    <Box padding="16px" background="surfaceSecondary">
+                        <Text>Tus archivos digitales estarán disponibles pronto en tu correo electrónico.</Text>
                     </Box>
                 ));
             }
@@ -78,38 +90,52 @@ export function App(nube: NubeSDK) {
             return;
         }
 
-        const { location, cart, store } = state;
-        console.log("[ZeroCart] Current page:", location?.page?.type, "| step:", location?.page?.data?.step);
+        const { location, cart, store, order } = state;
+        const pageType = location?.page?.type;
+        const step = location?.page?.data?.step;
 
-        if (location?.page?.type === "checkout" && location?.page?.data?.step === "success") {
-            const orderId = cart?.id;
+        console.log(`[ZeroCart] 📄 Page: ${pageType} | Step: ${step}`);
+
+        // DIAGNOSTIC: Log IDs found in state to see what's available on success page
+        console.log("[ZeroCart] 🔍 ID Discovery:", {
+            cartId: cart?.id,
+            orderId: order?.id,
+            orderCartId: order?.cart_id,
+            checkoutId: location?.page?.data?.checkoutId
+        });
+
+        if (pageType === "checkout" && step === "success") {
+            // Priority: cart.id (if still there), then order.cart_id (common on success), then order.id (fallback)
+            const cartId = cart?.id || order?.cart_id || location?.page?.data?.cartId || order?.id;
             const storeId = store?.id;
 
-            if (orderId && storeId) {
-                renderContent(orderId, storeId);
+            if (cartId && storeId) {
+                renderContent(cartId, storeId);
             } else {
-                console.warn("[ZeroCart] Missing cart.id or store.id in state");
+                console.warn("[ZeroCart] ⚠️ Could not determine cartId/storeId on success page", { cartId, storeId });
+                // Fallback: try to log a bit of state for debugging
+                console.log("[ZeroCart] 🕵️ Store Keys:", store ? Object.keys(store) : "null");
+                console.log("[ZeroCart] 🕵️ Cart Keys:", cart ? Object.keys(cart) : "null");
             }
         } else {
             // Clear if not on success page
-            nube.render("after_main_content", []);
+            nube?.render("after_main_content", []);
         }
     };
 
     // Register event listener
     try {
-        nube.on("location:updated", (state, event) => {
-            console.log("[ZeroCart] 📍 location:updated event received:", event);
+        nube.on("location:updated", (state) => {
+            console.log("[ZeroCart] 📍 location:updated event received");
             handleState(state);
         });
 
         // Initial check
         const initialState = nube.getState?.();
-        console.log("[ZeroCart] Initial state fetched:", initialState);
+        console.log("[ZeroCart] Initial state fetched during App() initialization");
         if (initialState) handleState(initialState);
 
     } catch (err) {
         console.error("[ZeroCart] ❌ Error during NubeSDK event registration:", err);
     }
 }
-
