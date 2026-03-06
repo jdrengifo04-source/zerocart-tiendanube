@@ -124,11 +124,28 @@ const initZeroCartExtension = (injectedNube: any) => {
     }
 };
 
-// AUTO-EXECUTE as IIFE
-// We pass 'nube' if it exists globally to the wrapper
+// DIAGNOSTIC POLLING
+const pollForNube = (retries = 20) => {
+    const keys = Object.keys(self).join(", ");
+    console.log(`[ZeroCart] 🔍 Discovery Attempt (${21 - retries}): Keys: ${keys}`);
+
+    // @ts-ignore
+    const sdk = (globalThis as any).nube || (self as any).nube;
+
+    if (sdk) {
+        console.log("[ZeroCart] ✅ NubeSDK found via polling!");
+        initZeroCartExtension(sdk);
+    } else if (retries > 0) {
+        // Continue polling every 250ms
+        setTimeout(() => pollForNube(retries - 1), 250);
+    } else {
+        console.error("[ZeroCart] ❌ NubeSDK not found after polling. The environment might be missing the expected 'nube' global.");
+    }
+};
+
 console.log("[ZeroCart] 🛠️ Script parsing started...");
 try {
-    initZeroCartExtension((globalThis as any).nube || (self as any).nube);
+    pollForNube();
 } catch (outerError) {
-    console.error("[ZeroCart] 💀 Fatal crash in IIFE wrapper:", outerError);
+    console.error("[ZeroCart] 💀 Fatal crash during initial poll:", outerError);
 }
