@@ -7,77 +7,166 @@ import type { NubeSDK, NubeComponent } from "@tiendanube/nube-sdk-types";
  */
 
 export function App(nube: NubeSDK) {
-    console.log("[ZeroCart] 🛡️ Diagnostic Version 24 Initialized.");
+    console.log("[ZeroCart] 💎 Premium Version 25 Initialized.");
 
-    const slotsToTest = ["after_header", "before_main_content"] as const;
+    const renderPremiumUI = (state: any) => {
+        const { cart, order, location } = state;
+        const cartId = cart?.id || order?.cart_id || location?.page?.data?.cartId || order?.id;
 
-    const renderDiagnostic = (cartId: string, storeId: string) => {
-        console.log(`[ZeroCart] 🛠️ Rendering Diagnostic UI for ${cartId}`);
+        // Extract product info
+        const items = cart?.items || order?.items || [];
+        const mainItem = items[0];
+        const productName = mainItem?.name || "Tu Producto Digital";
+        const productImage = mainItem?.thumbnail || "";
 
-        slotsToTest.forEach(slot => {
-            nube.render(slot as any, [
-                {
-                    type: "box",
-                    padding: "24px",
-                    margin: "16px",
-                    background: "surface",
-                    borderRadius: "12px",
-                    style: {
-                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                        border: "2px solid #3B82F6", // Blue border to identify NubeSDK rendering
+        console.log(`[ZeroCart] 🎨 Rendering Premium UI for ${productName}`);
+
+        nube.render("after_header" as any, [
+            {
+                type: "box",
+                padding: "32px",
+                background: "surface",
+                borderRadius: "16px",
+                style: {
+                    marginTop: "24px",
+                    marginBottom: "24px",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                    border: "1px solid #E5E7EB",
+                },
+                children: [
+                    // Header Section
+                    {
+                        type: "row",
+                        alignItems: "center",
+                        gap: "12px",
+                        style: { marginBottom: "24px" },
+                        children: [
+                            { type: "icon", name: "check-circle", color: "#10B981", size: "32px" },
+                            {
+                                type: "col",
+                                children: [
+                                    {
+                                        type: "txt",
+                                        children: "¡Tu compra ha sido aprobada!",
+                                        modifiers: ["bold"],
+                                        style: { fontSize: "24px", color: "#111827" }
+                                    },
+                                    {
+                                        type: "txt",
+                                        children: "Gracias por confiar en ZeroCart.",
+                                        style: { fontSize: "16px", color: "#6B7280" }
+                                    }
+                                ]
+                            }
+                        ]
                     },
-                    children: [
-                        {
-                            type: "row",
-                            alignItems: "center",
-                            gap: "12px",
-                            children: [
-                                { type: "icon", name: "check-circle", color: "#3B82F6", size: "24px" },
-                                {
-                                    type: "txt",
-                                    children: `Slot: ${slot} (v24)`,
-                                    modifiers: ["bold"],
-                                    style: { fontSize: "18px", color: "#111827" }
-                                }
-                            ]
+                    // Product Display Section
+                    {
+                        type: "box",
+                        padding: "20px",
+                        background: "#F9FAFB",
+                        borderRadius: "12px",
+                        style: {
+                            marginBottom: "24px",
+                            border: "1px dashed #D1D5DB"
                         },
-                        {
-                            type: "box",
-                            margin: "12px 0",
-                            children: [
-                                {
-                                    type: "txt",
-                                    children: "Si ves este cuadro azul con sombra, el diseño premium está funcionando.",
-                                    style: { color: "#4B5563" }
-                                }
-                            ]
-                        },
-                        {
-                            type: "link",
-                            href: "#",
-                            variant: "primary",
-                            style: { padding: "8px 16px", borderRadius: "6px" },
-                            children: ["Botón de Prueba"]
-                        }
-                    ]
-                }
-            ]);
-        });
+                        children: [
+                            {
+                                type: "row",
+                                alignItems: "center",
+                                gap: "16px",
+                                children: [
+                                    productImage ? {
+                                        type: "img",
+                                        src: productImage,
+                                        alt: productName,
+                                        width: "80px",
+                                        height: "80px",
+                                        style: { borderRadius: "8px", objectFit: "cover" as any }
+                                    } : {
+                                        type: "box",
+                                        width: "80px",
+                                        height: "80px",
+                                        background: "#E5E7EB",
+                                        borderRadius: "8px",
+                                        children: []
+                                    },
+                                    {
+                                        type: "col",
+                                        children: [
+                                            {
+                                                type: "txt",
+                                                children: productName,
+                                                modifiers: ["bold"],
+                                                style: { fontSize: "18px", color: "#1F2937" }
+                                            },
+                                            {
+                                                type: "txt",
+                                                children: "Listo para descargar",
+                                                style: { fontSize: "14px", color: "#10B981" }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    // Action Section
+                    {
+                        type: "row",
+                        alignItems: "center",
+                        gap: "16px",
+                        children: [
+                            {
+                                type: "link",
+                                href: `https://zerocart.jrengifo.com/download/${cartId}`,
+                                variant: "primary",
+                                style: {
+                                    paddingLeft: "32px",
+                                    paddingRight: "32px",
+                                    paddingTop: "16px",
+                                    paddingBottom: "16px",
+                                    borderRadius: "10px",
+                                    fontWeight: "700",
+                                    fontSize: "18px",
+                                    background: "#3B82F6",
+                                    color: "white",
+                                    textAlign: "center"
+                                },
+                                children: [
+                                    "Descargar Ahora"
+                                ]
+                            }
+                        ]
+                    },
+                    // Reminder Section
+                    {
+                        type: "box",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        background: "#FEF3C7",
+                        style: { marginTop: "24px" },
+                        children: [
+                            {
+                                type: "txt",
+                                children: "💡 Consejo: Guarda esta página en tus marcadores para acceder a tu descarga más tarde.",
+                                style: { fontSize: "13px", color: "#92400E", textAlign: "center" }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]);
     };
 
     const handleStateUpdate = (state: any, source: string) => {
         if (!state) return;
-        const { location, cart, store, order } = state;
+        const { location } = state;
         const pageType = location?.page?.type;
         const step = location?.page?.data?.step;
 
-        const cartId = cart?.id || order?.cart_id || location?.page?.data?.cartId || order?.id;
-        const storeId = store?.id;
-
         if (pageType === "checkout" && step === "success") {
-            if (cartId && storeId) {
-                renderDiagnostic(cartId, storeId);
-            }
+            renderPremiumUI(state);
         }
     };
 
