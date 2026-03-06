@@ -2,11 +2,19 @@ import { NubeSDK } from "@tiendanube/nube-sdk-types";
 import { Box, Text, Link } from "@tiendanube/nube-sdk-jsx";
 
 export function App(nube: NubeSDK) {
+    console.log("[ZeroCart] Extension App initialized successfully.");
+
     // Listen for navigation changes to detect the "success" checkout step
     nube.on("location:updated", async (eventData: any) => {
+        console.log("[ZeroCart] location:updated event received:", eventData);
         const state = eventData?.state || (nube as any).getState?.();
-        if (!state) return;
+        if (!state) {
+            console.warn("[ZeroCart] No state found in eventData or nube.getState()");
+            return;
+        }
+
         const { location, cart, store } = state;
+        console.log("[ZeroCart] Current step:", location?.page?.data?.step);
 
         if (
             location?.page?.type === "checkout" &&
