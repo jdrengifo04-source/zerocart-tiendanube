@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Input } from 'speed-code';
 import { Check, Palette, Expand, Zap, ImageIcon, Loader2 } from 'lucide-react';
+import { Switch } from './ui/switch';
 
 interface Product {
     id: number;
@@ -90,19 +91,24 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                 <div className="space-y-6">
                     {/* Enable Toggle - REDESIGNED iOS STYLE */}
                     <Card className="bg-[var(--bg-card)] p-8 rounded-[var(--radius-xl)] border-[var(--border-main)] shadow-[var(--shadow-soft)] premium-card">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h3 className="text-xl font-sora font-extrabold text-[var(--text-main)] mb-1">Activar 1 Click $</h3>
-                                <p className="text-sm font-medium text-[var(--text-secondary)]">Reemplaza "Agregar al Carrito" por compra directa.</p>
-                            </div>
-                            <button
-                                onClick={() => setIsEnabled(!isEnabled)}
-                                className="relative focus:outline-none"
-                            >
-                                <div className={`w-[48px] h-6 rounded-full transition-colors duration-200 ${isEnabled ? 'bg-[#22C55E]' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <div className={`absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${isEnabled ? 'translate-x-[24px]' : 'translate-x-0'}`} />
+                        <div className="p-4 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                        <Zap className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="font-semibold text-slate-900 dark:text-white leading-tight">Activar 1 Click $</p>
+                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-normal">Permite compras ultra rápidas</p>
+                                    </div>
                                 </div>
-                            </button>
+                                <Switch
+                                    checked={isEnabled}
+                                    onCheckedChange={(checked) => setIsEnabled(checked)}
+                                    size="default"
+                                    variant="brand"
+                                />
+                            </div>
                         </div>
                     </Card>
 

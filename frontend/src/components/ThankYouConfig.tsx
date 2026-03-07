@@ -10,6 +10,7 @@ import {
     CheckCircle,
     Package
 } from "lucide-react";
+import { Switch } from "./ui/switch";
 
 interface Product {
     id: number;
@@ -110,22 +111,24 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
 
                         <hr className="border-[var(--border-main)] opacity-50" />
 
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h4 className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-1 flex items-center gap-2">
-                                    <ImageIcon size={16} className="text-[var(--primary-fixed)]" />
-                                    Mostrar imágenes
-                                </h4>
-                                <p className="text-xs text-[var(--text-secondary)] font-medium">Incluye la imagen del producto en la tarjeta.</p>
-                            </div>
-                            <button
-                                onClick={() => setShowImage(!showImage)}
-                                className="relative focus:outline-none"
-                            >
-                                <div className={`w-[48px] h-6 rounded-full transition-colors duration-200 ${showImage ? 'bg-[#22C55E]' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <div className={`absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${showImage ? 'translate-x-[24px]' : 'translate-x-0'}`} />
+                        <div className="p-4 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                        <ImageIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="font-semibold text-slate-900 dark:text-white leading-tight">Mostrar imágenes</p>
+                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-normal">Ver fotos de productos en el resumen</p>
+                                    </div>
                                 </div>
-                            </button>
+                                <Switch
+                                    checked={showImage}
+                                    onCheckedChange={setShowImage}
+                                    size="default"
+                                    variant="brand"
+                                />
+                            </div>
                         </div>
                     </Card>
 
