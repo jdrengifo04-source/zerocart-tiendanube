@@ -11,6 +11,7 @@ import Sidebar from './components/Sidebar';
 import ProductCard from './components/ProductCard';
 import OneClickConfig from './components/OneClickConfig';
 import ThankYouConfig from './components/ThankYouConfig';
+import WhatsAppButton from './components/WhatsAppButton';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfUse from './TermsOfUse';
 
@@ -124,50 +125,18 @@ function App() {
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col overflow-hidden relative theme-transition">
 
-        {/* HEADER - Stitch Style */}
-        <header className="h-16 px-8 flex items-center justify-between shrink-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-10">
-          {activeTab === 'products' && (
-            <div className="flex-1 max-w-xl">
-              <div className="relative group flex items-center w-full max-w-md bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 focus-within:bg-white dark:focus-within:bg-white/10 focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/20 transition-all shadow-sm">
-                <div className="flex items-center justify-center pointer-events-none text-slate-400 group-focus-within:text-primary group-focus-within:scale-110 transition-all duration-300 mr-3">
-                  <Search size={18} strokeWidth={2.5} />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Buscar productos..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-2.5 text-sm font-medium placeholder:text-slate-500 outline-none dark:text-white bg-transparent"
-                />
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'products' && (
-            <div className="flex items-center gap-4 ml-auto">
-              <Button
-                variant="outline"
-                onClick={fetchProducts}
-                className="h-9 px-4 rounded-lg border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 font-bold text-xs gap-2 transition-all"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                Sincronizar
-              </Button>
-            </div>
-          )}
-        </header>
-
         {/* VIEWPORT */}
         <main className="flex-1 overflow-y-auto p-8 lg:p-12 custom-scrollbar">
           <div className="max-w-7xl mx-auto">
 
-            {/* Dashboard Headers */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-              <div>
-                <h1 className="text-3xl font-sora font-extrabold text-slate-900 dark:text-white tracking-tightest mb-1.5">
+            {/* Dashboard Headers - Professional Three-Row Redesign */}
+            <div className="flex flex-col gap-8 mb-10">
+              {/* Row 1: Information Layer */}
+              <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                <h1 className="text-4xl font-sora font-extrabold text-slate-900 dark:text-white tracking-tightest mb-3">
                   {activeTab === 'dashboard' ? 'Tutorial de Configuración' : activeTab === 'one-click' ? 'Configurar 1 Click $' : activeTab === 'thank-you' ? 'Configurar Página de Gracias' : 'Tus Productos'}
                 </h1>
-                <p className="text-sm font-medium text-slate-500">
+                <p className="text-base font-medium text-slate-500 max-w-3xl leading-relaxed">
                   {activeTab === 'dashboard'
                     ? 'Aprende a configurar tu tienda y enlazar tus productos paso a paso.'
                     : activeTab === 'one-click' ? 'Personaliza el botón de compra directa para aumentar conversiones.'
@@ -179,20 +148,53 @@ function App() {
               </div>
 
               {activeTab === 'products' && (
-                <div className="flex items-center bg-slate-100 dark:bg-white/5 p-1 rounded-xl">
-                  {['all', 'linked', 'unlinked'].map((status) => (
-                    <button
-                      key={status}
-                      onClick={() => setFilterStatus(status as FilterStatus)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${filterStatus === status
-                        ? 'bg-white dark:bg-white/10 shadow-sm text-primary'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                        }`}
+                <>
+                  {/* Row 2: Action Layer (Search & Sync) */}
+                  <div className="flex flex-col md:flex-row items-stretch gap-4 animate-in fade-in slide-in-from-left-4 duration-500 delay-75">
+                    {/* Dominant Search Bar */}
+                    <div className="relative group flex items-center flex-grow bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/20 transition-all shadow-sm">
+                      <div className="flex items-center justify-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-all duration-300 mr-4">
+                        <Search size={22} strokeWidth={2} />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Busca por nombre, categoría o ID de producto..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full py-4.5 text-base font-semibold placeholder:text-slate-400 outline-none dark:text-white bg-transparent"
+                      />
+                    </div>
+
+                    {/* Compact Fixed-Size Sync Button */}
+                    <Button
+                      variant="outline"
+                      onClick={fetchProducts}
+                      className="md:w-56 h-auto min-h-[64px] rounded-2xl border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 font-black text-xs uppercase tracking-widest gap-3 transition-all shadow-sm premium-button"
                     >
-                      {status === 'all' ? 'Todos' : status === 'linked' ? 'Vinculados' : 'Sin Enlace'}
-                    </button>
-                  ))}
-                </div>
+                      <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                      <span>Sincronizar</span>
+                    </Button>
+                  </div>
+
+                  {/* Row 3: Filter Layer (Professional Tabs) */}
+                  <div className="flex items-center gap-2 p-1.5 bg-slate-100/50 dark:bg-black/20 w-fit rounded-[20px] border border-slate-200/50 dark:border-white/5 backdrop-blur-sm animate-in fade-in slide-in-from-left-4 duration-500 delay-150">
+                    {['all', 'linked', 'unlinked'].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setFilterStatus(status as FilterStatus)}
+                        className={`px-6 py-2.5 rounded-[14px] text-xs font-black uppercase tracking-widest transition-all duration-500 relative ${filterStatus === status
+                          ? 'bg-white dark:bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-primary scale-100'
+                          : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                          }`}
+                      >
+                        {status === 'all' ? 'Todos los Productos' : status === 'linked' ? 'Vinculados' : 'Sin Enlace'}
+                        {filterStatus === status && (
+                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
@@ -272,6 +274,7 @@ function App() {
           </div>
         </main>
       </div>
+      <WhatsAppButton />
     </div>
   );
 }

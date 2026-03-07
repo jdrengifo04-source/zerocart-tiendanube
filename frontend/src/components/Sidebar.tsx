@@ -69,39 +69,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </nav>
                 </div>
 
-                <div className="mb-8 w-full">
-                    <p className="px-5 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] opacity-70">Legal y Soporte</p>
-                    <nav className="space-y-1">
-                        {[
-                            { id: 'privacy', label: 'Privacidad', icon: CheckCircle },
-                            { id: 'terms', label: 'Términos', icon: Package }
-                        ].map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-medium text-[14px] px-5 ${activeTab === item.id
-                                    ? 'sidebar-active-glow text-white shadow-lg shadow-primary/10'
-                                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                                    }`}
-                            >
-                                <div className={`flex items-center gap-3 justify-start`} style={{ width: '85%' }}>
-                                    <item.icon className={`w-4.5 h-4.5 shrink-0 ${activeTab === item.id ? 'text-primary' : 'text-slate-400'}`} />
-                                    <span className={activeTab === item.id ? 'text-white' : 'text-slate-300'}>{item.label}</span>
-                                </div>
-                                {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />}
-                            </button>
-                        ))}
-                        <a
-                            href="mailto:soporte@zerocart.com"
-                            className="w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-medium text-[14px] px-5 text-slate-300 hover:text-white hover:bg-white/5"
-                        >
-                            <div className={`flex items-center gap-3 justify-start`} style={{ width: '85%' }}>
-                                <Package className="w-4.5 h-4.5 shrink-0 text-slate-400" />
-                                <span>Soporte</span>
-                            </div>
-                        </a>
-                    </nav>
-                </div>
             </div>
 
             <div className="p-4 border-t border-white/5 bg-[#080d18]/50 overflow-hidden">
@@ -119,14 +86,30 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                 </div>
 
-                <div className={`flex items-center px-2 justify-center`}>
+                <div className={`flex flex-col gap-3 px-2`}>
                     <button
                         onClick={toggleTheme}
-                        className={`p-2 text-slate-400 hover:text-white transition-all bg-white/5 rounded-lg border border-white/5 hover:border-white/10 w-full flex items-center justify-center gap-2`}
+                        className={`p-2 text-slate-400 hover:text-white transition-all bg-white/5 rounded-lg border border-white/5 hover:border-white/10 w-full flex items-center justify-center gap-2 mb-2`}
                     >
                         {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
                         <span className="text-[11px] font-medium uppercase tracking-wider">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
                     </button>
+
+                    <div className="flex items-center justify-center gap-4 py-1">
+                        <button
+                            onClick={() => setActiveTab('privacy')}
+                            className="text-[10px] text-slate-500 hover:text-white transition-colors uppercase tracking-widest font-bold"
+                        >
+                            Privacidad
+                        </button>
+                        <div className="w-1 h-1 rounded-full bg-slate-700" />
+                        <button
+                            onClick={() => setActiveTab('terms')}
+                            className="text-[10px] text-slate-500 hover:text-white transition-colors uppercase tracking-widest font-bold"
+                        >
+                            Términos
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
