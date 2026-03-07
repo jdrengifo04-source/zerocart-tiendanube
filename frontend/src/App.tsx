@@ -112,7 +112,7 @@ function App() {
   });
 
   return (
-    <div className="flex h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden theme-transition">
+    <div className="flex h-screen bg-[var(--bg-app)] font-jakarta text-[var(--text-main)] overflow-hidden theme-transition">
 
       <Sidebar
         activeTab={activeTab}
@@ -133,7 +133,7 @@ function App() {
             <div className="flex flex-col gap-8 mb-10">
               {/* Row 1: Information Layer */}
               <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-                <h1 className="text-4xl font-sora font-extrabold text-slate-900 dark:text-white tracking-tightest mb-3">
+                <h1 className="text-4xl font-jakarta font-extrabold text-[var(--text-main)] dark:text-white tracking-tightest mb-3">
                   {activeTab === 'dashboard' ? 'Tutorial de Configuración' : activeTab === 'one-click' ? 'Configurar 1 Click $' : activeTab === 'thank-you' ? 'Configurar Página de Gracias' : 'Tus Productos'}
                 </h1>
                 <p className="text-base font-medium text-slate-500 max-w-3xl leading-relaxed">

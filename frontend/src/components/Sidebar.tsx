@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     return (
         <aside
             ref={sidebarRef}
-            className={`h-screen bg-[var(--sidebar-navy)] flex flex-col shrink-0 z-20 shadow-2xl relative border-r border-white/5 transition-[width] duration-300 ease-in-out dark group w-68`}
+            className={`h-screen bg-[var(--sidebar-fixed-bg)] flex flex-col shrink-0 z-20 shadow-2xl relative border-r border-white/5 transition-[width] duration-300 ease-in-out dark group w-68 text-white`}
         >
             <div className={`p-8 pb-10 flex justify-center transition-all duration-300`}>
                 <button
@@ -42,8 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className={`flex-1 overflow-y-auto px-4 custom-scrollbar`}>
-                <div className="mb-8 w-full">
-                    <p className="px-5 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] opacity-70">Menú Principal</p>
+                <div className="mb-8 w-full font-jakarta">
+                    <p className="px-5 mb-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-70">Menú Principal</p>
                     <nav className="space-y-1">
                         {[
                             { id: 'dashboard', label: 'Tutoriales', icon: LayoutDashboard },
@@ -54,16 +54,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-medium text-[14px] px-5 ${activeTab === item.id
-                                    ? 'sidebar-active-glow text-white shadow-lg shadow-primary/10'
+                                className={`w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-semibold text-[14px] px-5 ${activeTab === item.id
+                                    ? 'bg-[var(--primary-fixed)] text-white shadow-lg shadow-primary/20'
                                     : 'text-slate-300 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 <div className={`flex items-center gap-3 justify-start`} style={{ width: '85%' }}>
-                                    <item.icon className={`w-4.5 h-4.5 shrink-0 ${activeTab === item.id ? 'text-primary' : 'text-slate-400'}`} />
+                                    <item.icon className={`w-4.5 h-4.5 shrink-0 ${activeTab === item.id ? 'text-white' : 'text-slate-400'}`} />
                                     <span className={activeTab === item.id ? 'text-white' : 'text-slate-300'}>{item.label}</span>
                                 </div>
-                                {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 text-white opacity-70 shrink-0" />}
                             </button>
                         ))}
                     </nav>
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <p className="text-[11px] font-semibold text-white truncate">Store #{storeId || '7317678'}</p>
                     <div className="mt-3 w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary w-full shadow-[0_0_8px_rgba(0,82,255,0.4)]" />
+                        <div className="h-full bg-[var(--primary-fixed)] w-full shadow-[0_0_8px_rgba(0,82,255,0.4)]" />
                     </div>
                 </div>
 

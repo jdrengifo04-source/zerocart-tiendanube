@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -10,13 +10,35 @@
     font-weight: 400;
 
     color-scheme: light;
-    background-color: #f8f9fa;
-    color: #0f172a;
 
-    --sidebar-navy: #0f1c3d;
-    /* More bluish tinted navy */
+    /* Semantic Design Tokens - Light Mode */
+    --bg-app: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --text-main: #0F172A;
+    --text-secondary: #64748B;
+    --border-main: #E2E8F0;
+    --input-bg: #FFFFFF;
+
+    /* Fixed Constants (Same in both modes) */
+    --primary-fixed: #0052FF;
+    --primary-fixed-hover: #0045D9;
+    --sidebar-fixed-bg: #0A1526;
+    --white: #FFFFFF;
+    --success-vibrant: #22C55E;
+    --error-vibrant: #EF4444;
+
+    /* Shapes & Elevation */
+    --radius-xl: 32px;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --shadow-soft: 0px 4px 20px rgba(0, 0, 0, 0.08);
+
     --sidebar-width: 272px;
     --sidebar-collapsed-width: 80px;
+
+    background-color: var(--bg-app);
+    color: var(--text-main);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -30,8 +52,12 @@
 
 .dark {
     color-scheme: dark;
-    background-color: #000000;
-    color: #f8fafc;
+    --bg-app: #050B14;
+    --bg-card: #111E36;
+    --text-main: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --border-main: #334155;
+    --input-bg: #050B14;
 }
 
 body {
@@ -43,6 +69,10 @@ body {
 }
 
 /* Typography */
+.font-jakarta {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
 .font-sora {
     font-family: 'Sora', sans-serif;
 }

@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Input } from 'speed-code';
-import { ToggleLeft, ToggleRight, Check, CheckCircle, ImageIcon, Loader2, Type, AlignLeft } from 'lucide-react';
+import {
+    Check,
+    Loader2,
+    Type,
+    AlignLeft,
+    Image as ImageIcon,
+    CheckCircle,
+    Package
+} from "lucide-react";
 
 interface Product {
     id: number;
@@ -67,54 +75,56 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto font-jakarta">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* CONFIGURATION PANEL */}
                 <div className="space-y-6">
-                    <Card className="bg-white dark:bg-[#080d18] p-8 rounded-[32px] border-slate-200 dark:border-white/5 shadow-sm premium-card space-y-8">
+                    <Card className="bg-[var(--bg-card)] p-8 rounded-[var(--radius-xl)] border-[var(--border-main)] shadow-[var(--shadow-soft)] premium-card space-y-8">
                         <div>
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <Type size={16} className="text-primary" />
+                            <h4 className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <Type size={16} className="text-[var(--primary-fixed)]" />
                                 Titular de la página
                             </h4>
                             <Input
                                 value={headline}
                                 onChange={(e) => setHeadline(e.target.value)}
                                 placeholder="Ej: ¡Tu descarga está lista!"
-                                className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 rounded-xl font-medium"
+                                className="w-full bg-[var(--input-bg)] border-[#475569]/30 dark:border-[#475569] rounded-[var(--radius-sm)] font-medium focus:ring-2 focus:ring-[var(--primary-fixed)]/20 focus:border-[var(--primary-fixed)] transition-all text-[var(--text-main)]"
                             />
                         </div>
 
-                        <hr className="border-slate-100 dark:border-white/5" />
+                        <hr className="border-[var(--border-main)] opacity-50" />
 
                         <div>
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <AlignLeft size={16} className="text-primary" />
+                            <h4 className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <AlignLeft size={16} className="text-[var(--primary-fixed)]" />
                                 Mensaje de agradecimiento
                             </h4>
                             <textarea
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Ej: Gracias por tu compra..."
-                                className="w-full min-h-[100px] p-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl font-medium text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all dark:text-white"
+                                className="w-full min-h-[100px] p-4 bg-[var(--input-bg)] border border-[#475569]/30 dark:border-[#475569] rounded-[var(--radius-sm)] font-medium text-sm outline-none focus:ring-2 focus:ring-[var(--primary-fixed)]/20 focus:border-[var(--primary-fixed)] transition-all text-[var(--text-main)]"
                             />
                         </div>
 
-                        <hr className="border-slate-100 dark:border-white/5" />
+                        <hr className="border-[var(--border-main)] opacity-50" />
 
                         <div className="flex items-center justify-between">
                             <div>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-2">
-                                    <ImageIcon size={16} className="text-primary" />
+                                <h4 className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-1 flex items-center gap-2">
+                                    <ImageIcon size={16} className="text-[var(--primary-fixed)]" />
                                     Mostrar imágenes
                                 </h4>
-                                <p className="text-xs text-slate-500 font-medium">Incluye la imagen del producto en la tarjeta.</p>
+                                <p className="text-xs text-[var(--text-secondary)] font-medium">Incluye la imagen del producto en la tarjeta.</p>
                             </div>
                             <button
                                 onClick={() => setShowImage(!showImage)}
-                                className={`transition-all duration-300 ${showImage ? 'text-primary scale-110' : 'text-slate-400 dark:text-slate-600 hover:text-slate-500'}`}
+                                className="relative focus:outline-none"
                             >
-                                {showImage ? <ToggleRight strokeWidth={1.5} size={40} /> : <ToggleLeft strokeWidth={1.5} size={40} />}
+                                <div className={`w-[48px] h-6 rounded-full transition-colors duration-200 ${showImage ? 'bg-[#22C55E]' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                    <div className={`absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${showImage ? 'translate-x-[24px]' : 'translate-x-0'}`} />
+                                </div>
                             </button>
                         </div>
                     </Card>
@@ -123,70 +133,63 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
                         <Button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="bg-white dark:bg-primary text-slate-900 dark:text-white border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-primary/80 rounded-xl font-bold px-8 py-6 h-auto shadow-sm dark:shadow-xl dark:shadow-primary/10 group transition-all"
+                            className="bg-[#0052FF] hover:bg-[#0045D9] text-white rounded-xl font-semibold px-6 py-3 h-auto shadow-none border-none transition-all !opacity-100 disabled:!opacity-50"
                         >
                             {isSaving ? (
-                                <Loader2 className="mr-2 w-5 h-5 animate-spin text-slate-500 dark:text-white" />
+                                <Loader2 className="mr-2 w-5 h-5 animate-spin text-white" />
                             ) : (
-                                <Check className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform text-emerald-500 dark:text-white" />
+                                <Check className="mr-2 w-5 h-5 text-white" />
                             )}
-                            {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+                            <span className="text-white">{isSaving ? 'Guardando...' : 'Guardar Configuración'}</span>
                         </Button>
                     </div>
                 </div>
 
-                {/* VISUAL PREVIEW */}
-                <div className="lg:sticky lg:top-8 h-fit">
-                    <Card className="bg-slate-50 dark:bg-white/[0.02] p-8 md:p-12 rounded-[32px] border-slate-200 dark:border-white/5 overflow-hidden relative">
+                {/* VISUAL PREVIEW - FIXED LIGHT MODE */}
+                <div className="lg:sticky lg:top-8 h-fit light">
+                    <Card className="bg-white p-8 md:p-12 rounded-[var(--radius-xl)] border-[#E2E8F0] overflow-hidden relative shadow-[var(--shadow-soft)]">
                         <div className="mt-4 text-center">
                             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Vista Previa de Entrega</h3>
 
-                            {/* Thank You Card Preview - Exact Match with mockup-paginagracias.html */}
+                            {/* Thank You Card Preview - Forced dark text for visibility in both modes */}
                             <div className="bg-white rounded-[24px] border border-gray-100 shadow-2xl overflow-hidden max-w-sm mx-auto text-center animate-in zoom-in-95 duration-500">
-                                {/* Success Header */}
-                                <div className="pt-10 pb-6 px-8 flex flex-col items-center">
-                                    <div className="mb-4 bg-emerald-50 p-3 rounded-full">
-                                        <CheckCircle size={48} className="text-emerald-500" />
+                                <div className="p-8">
+                                    <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <CheckCircle className="text-green-500 w-8 h-8" />
                                     </div>
-                                    <h4 className="text-[24px] font-bold text-slate-900 tracking-tight leading-tight">
-                                        {headline}
-                                    </h4>
-                                    <p className="mt-2 text-sm text-slate-500 font-medium leading-relaxed">
-                                        {message}
+                                    <h2 className="text-2xl font-extrabold text-[#0F172A] mb-3">{headline || '¡Tu descarga está lista!'}</h2>
+                                    <p className="text-slate-600 font-medium leading-relaxed">
+                                        {message || 'Gracias por tu compra. Tu pedido está siendo procesado con éxito.'}
                                     </p>
                                 </div>
 
-                                <hr className="border-gray-100 mx-8" />
-
-                                {/* Product View Section */}
-                                <div className="py-8 px-8 flex flex-col items-center">
-                                    {showImage && (
-                                        <div className="w-40 h-40 bg-primary/10 rounded-2xl shadow-lg flex items-center justify-center mb-6 overflow-hidden transform hover:scale-105 transition-transform duration-300">
-                                            {product?.image ? (
-                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="text-primary text-6xl font-black select-none">Z</div>
-                                            )}
+                                {showImage && (
+                                    <div className="px-8 pb-8">
+                                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100/50">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-20 h-20 bg-white rounded-xl border border-slate-100 flex items-center justify-center p-2">
+                                                    {product?.image ? (
+                                                        <img src={product.image} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+                                                    ) : (
+                                                        <Package className="text-slate-400 w-10 h-10" />
+                                                    )}
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Producto Premium</p>
+                                                    <p className="text-[#0F172A] font-bold leading-tight">{product?.name || 'Video Masterclass: Estrategias de Venta 2024'}</p>
+                                                    <p className="text-[#0052FF] font-bold mt-1 text-sm">{product?.price || '$47.00'}</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="text-center">
-                                        <h2 className="text-xl font-bold text-slate-900 mb-2">
-                                            {product?.name || 'Producto Digital'}
-                                        </h2>
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-wider">
-                                            <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
-                                            Listo para descargar
-                                        </span>
                                     </div>
-                                </div>
+                                )}
 
-                                {/* Action Section */}
-                                <div className="px-8 pb-4">
+                                <div className="px-8 pb-10">
                                     <a
                                         href={product?.googleDriveLink || '#'}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full bg-[#3b82f6] hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group no-underline"
+                                        className="w-full bg-[#0F172A] hover:bg-slate-800 text-white rounded-xl py-4 h-auto font-bold tracking-wide transition-all shadow-lg shadow-slate-200 flex items-center justify-center gap-2 no-underline"
                                     >
                                         <svg className="h-6 w-6 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
