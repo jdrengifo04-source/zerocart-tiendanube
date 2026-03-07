@@ -6,12 +6,22 @@ import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { getProducts, registerBuyNowScript, handleOrderPaidWebhook, updateProductLink } from './controllers/tiendanube.controller.js';
+import {
+    getProducts,
+    registerBuyNowScript,
+    handleOrderPaidWebhook,
+    updateProductLink,
+    handleAppUninstalledWebhook,
+    handleStoreRedact,
+    handleCustomerRedact,
+    handleCustomerDataRequest
+} from './controllers/tiendanube.controller.js';
 import { handleTiendanubeCallback } from './controllers/auth.controller.js';
 import { getStoreConfig, updateStoreConfig } from './controllers/config.controller.js';
 import { serveDynamicScript } from './controllers/script.controller.js';
 import { getOrderDetails } from './controllers/order.controller.js';
 import { authStore } from './middleware/authStore.js';
+import { verifyTiendanubeHMAC } from './middleware/verifyHMAC.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,8 +58,14 @@ app.get('/health', (req: Request, res: Response) => {
 // Auth Handshake (OAuth) - No requiere middleware de tienda porque lo ESTÁ CREANDO
 app.get('/auth/tn/callback', handleTiendanubeCallback);
 
-// Webhooks - Identificación de tienda interna
-app.post('/api/webhooks/order-paid', handleOrderPaidWebhook);
+// Webhooks - Identificación de tienda interna + Protección HMAC
+app.post('/api/webhooks/order-paid', verifyTiendanubeHMAC, handleOrderPaidWebhook);
+app.post('/api/webhooks/app-uninstalled', verifyTiendanubeHMAC, handleAppUninstalledWebhook);
+
+// GDPR Mandatory Webhooks
+app.post('/api/webhooks/gdpr/store-redact', verifyTiendanubeHMAC, handleStoreRedact);
+app.post('/api/webhooks/gdpr/customer-redact', verifyTiendanubeHMAC, handleCustomerRedact);
+app.post('/api/webhooks/gdpr/customer-data', verifyTiendanubeHMAC, handleCustomerDataRequest);
 
 // Rutas Protegidas por Store Context
 app.get('/api/products', authStore, getProducts);

@@ -69,7 +69,39 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </nav>
                 </div>
 
-
+                <div className="mb-8 w-full">
+                    <p className="px-5 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] opacity-70">Legal y Soporte</p>
+                    <nav className="space-y-1">
+                        {[
+                            { id: 'privacy', label: 'Privacidad', icon: CheckCircle },
+                            { id: 'terms', label: 'Términos', icon: Package }
+                        ].map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-medium text-[14px] px-5 ${activeTab === item.id
+                                    ? 'sidebar-active-glow text-white shadow-lg shadow-primary/10'
+                                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                <div className={`flex items-center gap-3 justify-start`} style={{ width: '85%' }}>
+                                    <item.icon className={`w-4.5 h-4.5 shrink-0 ${activeTab === item.id ? 'text-primary' : 'text-slate-400'}`} />
+                                    <span className={activeTab === item.id ? 'text-white' : 'text-slate-300'}>{item.label}</span>
+                                </div>
+                                {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            </button>
+                        ))}
+                        <a
+                            href="mailto:soporte@zerocart.com"
+                            className="w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 font-medium text-[14px] px-5 text-slate-300 hover:text-white hover:bg-white/5"
+                        >
+                            <div className={`flex items-center gap-3 justify-start`} style={{ width: '85%' }}>
+                                <Package className="w-4.5 h-4.5 shrink-0 text-slate-400" />
+                                <span>Soporte</span>
+                            </div>
+                        </a>
+                    </nav>
+                </div>
             </div>
 
             <div className="p-4 border-t border-white/5 bg-[#080d18]/50 overflow-hidden">

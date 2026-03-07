@@ -11,6 +11,8 @@ import Sidebar from './components/Sidebar';
 import ProductCard from './components/ProductCard';
 import OneClickConfig from './components/OneClickConfig';
 import ThankYouConfig from './components/ThankYouConfig';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfUse from './TermsOfUse';
 
 import { Button } from 'speed-code';
 
@@ -170,7 +172,9 @@ function App() {
                     ? 'Aprende a configurar tu tienda y enlazar tus productos paso a paso.'
                     : activeTab === 'one-click' ? 'Personaliza el botón de compra directa para aumentar conversiones.'
                       : activeTab === 'thank-you' ? 'Personaliza la experiencia de entrega de tus productos digitales.'
-                        : 'Gestiona los enlaces de descarga digital para tus productos físicos.'}
+                        : activeTab === 'privacy' ? 'Cómo protegemos la información de tu tienda.'
+                          : activeTab === 'terms' ? 'Reglas y condiciones para el uso de ZeroCart.'
+                            : 'Gestiona los enlaces de descarga digital para tus productos físicos.'}
                 </p>
               </div>
 
@@ -218,6 +222,10 @@ function App() {
               )
             ) : activeTab === 'thank-you' ? (
               <ThankYouConfig product={products[0]} />
+            ) : activeTab === 'privacy' ? (
+              <PrivacyPolicy />
+            ) : activeTab === 'terms' ? (
+              <TermsOfUse />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {loading ? (
