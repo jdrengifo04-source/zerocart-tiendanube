@@ -141,53 +141,70 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
                         <div className="mt-4 text-center">
                             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Vista Previa de Entrega</h3>
 
-                            {/* Thank You Card Preview */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-primary/10 p-8 shadow-xl text-left max-w-sm mx-auto">
-                                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mb-5 mx-auto">
-                                    <CheckCircle size={24} className="text-emerald-500" />
+                            {/* Thank You Card Preview - Exact Match with mockup-paginagracias.html */}
+                            <div className="bg-white rounded-[24px] border border-gray-100 shadow-2xl overflow-hidden max-w-sm mx-auto text-center animate-in zoom-in-95 duration-500">
+                                {/* Success Header */}
+                                <div className="pt-10 pb-6 px-8 flex flex-col items-center">
+                                    <div className="mb-4 bg-emerald-50 p-3 rounded-full">
+                                        <CheckCircle size={48} className="text-emerald-500" />
+                                    </div>
+                                    <h4 className="text-[24px] font-bold text-slate-900 tracking-tight leading-tight">
+                                        {headline}
+                                    </h4>
+                                    <p className="mt-2 text-sm text-slate-500 font-medium leading-relaxed">
+                                        {message}
+                                    </p>
                                 </div>
 
-                                <h4 className="text-xl font-sora font-extrabold text-slate-900 dark:text-white text-center mb-2 leading-tight">
-                                    {headline}
-                                </h4>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-8 leading-relaxed">
-                                    {message}
-                                </p>
+                                <hr className="border-gray-100 mx-8" />
 
-                                <div className="space-y-4">
-                                    <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl flex items-center gap-4">
-                                        {showImage && (
-                                            <div className="w-12 h-12 bg-slate-200 dark:bg-white/10 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
-                                                {product?.image ? (
-                                                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <ImageIcon size={20} className="text-slate-400" />
-                                                )}
-                                            </div>
-                                        )}
-                                        <div className="flex-1 overflow-hidden">
-                                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate mb-1">
-                                                {product?.name || 'Nombre del Producto Digital'}
-                                            </div>
-                                            <a
-                                                href={product?.googleDriveLink || '#'}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-block px-3 py-1.5 bg-primary text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:bg-primary/90 transition-colors cursor-pointer no-underline"
-                                            >
-                                                Descargar Ahora
-                                            </a>
+                                {/* Product View Section */}
+                                <div className="py-8 px-8 flex flex-col items-center">
+                                    {showImage && (
+                                        <div className="w-40 h-40 bg-primary/10 rounded-2xl shadow-lg flex items-center justify-center mb-6 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                                            {product?.image ? (
+                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="text-primary text-6xl font-black select-none">Z</div>
+                                            )}
                                         </div>
+                                    )}
+                                    <div className="text-center">
+                                        <h2 className="text-xl font-bold text-slate-900 mb-2">
+                                            {product?.name || 'Producto Digital'}
+                                        </h2>
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-wider">
+                                            <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                                            Listo para descargar
+                                        </span>
                                     </div>
                                 </div>
 
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/5 opacity-40">
-                                    <div className="h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full mb-2"></div>
-                                    <div className="h-2 w-2/3 bg-slate-100 dark:bg-white/5 rounded-full"></div>
+                                {/* Action Section */}
+                                <div className="px-8 pb-4">
+                                    <a
+                                        href={product?.googleDriveLink || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full bg-[#3b82f6] hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group no-underline"
+                                    >
+                                        <svg className="h-6 w-6 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+                                        </svg>
+                                        Descargar Ahora
+                                    </a>
+                                </div>
+
+                                {/* Tip Section Footer */}
+                                <div className="p-6 bg-gray-50/50 border-t border-gray-100 mt-4">
+                                    <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 flex gap-3 items-start text-left">
+                                        <span className="text-lg">💡</span>
+                                        <p className="text-xs text-yellow-800 leading-relaxed">
+                                            <strong>Consejo:</strong> Guarda esta página en tus marcadores para acceder a tu descarga más tarde.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-
-                            <p className="mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Página de Éxito Tiendanube</p>
                         </div>
                     </Card>
                 </div>
