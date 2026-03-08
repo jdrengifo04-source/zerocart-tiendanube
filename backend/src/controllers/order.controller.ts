@@ -77,7 +77,7 @@ export const getOrderDetails = async (req: Request, res: Response) => {
                 const dbProduct = dbProducts.find(dp => dp.id === p.product_id.toString());
                 return {
                     id: p.product_id,
-                    name: p.name.es || Object.values(p.name)[0],
+                    name: typeof p.name === 'string' ? p.name : (p.name.es || Object.values(p.name)[0]),
                     image: p.image?.src || null,
                     googleDriveLink: dbProduct?.googleDriveLink || null
                 };

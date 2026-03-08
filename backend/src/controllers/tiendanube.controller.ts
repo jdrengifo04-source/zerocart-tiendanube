@@ -31,7 +31,7 @@ export const getProducts = async (req: Request, res: Response) => {
             const firstVariant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
             return {
                 ...p,
-                name: p.name.es || Object.values(p.name)[0], // Normalizar el nombre aquí también por si acaso
+                name: typeof p.name === 'string' ? p.name : (p.name.es || Object.values(p.name)[0]), // Normalizar el nombre aquí también por si acaso
                 image: p.images && p.images.length > 0 ? p.images[0].src : null,
                 googleDriveLink: dbProduct?.googleDriveLink || '',
                 price: firstVariant ? firstVariant.price : '0.00',
@@ -144,7 +144,7 @@ export const handleOrderPaidWebhook = async (req: Request, res: Response) => {
                     const digitalProducts = orderData.products.map((p: any) => {
                         const dbProduct = dbProducts.find(dp => dp.id === p.product_id?.toString());
                         return {
-                            name: p.name?.es || (p.name ? Object.values(p.name)[0] : 'Producto Digital'),
+                            name: typeof p.name === 'string' ? p.name : (p.name?.es || (p.name ? Object.values(p.name)[0] : 'Producto Digital')),
                             image: p.image?.src || null,
                             googleDriveLink: dbProduct?.googleDriveLink || null
                         };
