@@ -149,19 +149,19 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
                 </div>
 
                 {/* VISUAL PREVIEW - FIXED LIGHT MODE */}
-                <div className="lg:sticky lg:top-8 h-fit light">
-                    <Card className="bg-white p-8 md:p-12 rounded-[var(--radius-xl)] border-[#E2E8F0] overflow-hidden relative shadow-[var(--shadow-soft)]">
+                <div className="lg:sticky lg:top-8 h-fit">
+                    <Card className="!bg-white p-8 md:p-12 rounded-[var(--radius-xl)] border-[#E2E8F0] overflow-hidden relative shadow-[var(--shadow-soft)]">
                         <div className="mt-4 text-center">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Vista Previa de Entrega</h3>
+                            <h3 className="text-sm font-bold !text-slate-500 uppercase tracking-widest mb-8">Vista Previa de Entrega</h3>
 
                             {/* Thank You Card Preview - Forced dark text for visibility in both modes */}
-                            <div className="bg-white rounded-[24px] border border-gray-100 shadow-2xl overflow-hidden max-w-sm mx-auto text-center animate-in zoom-in-95 duration-500">
+                            <div className="!bg-white rounded-[24px] border border-gray-100 shadow-2xl overflow-hidden max-w-sm mx-auto text-center animate-in zoom-in-95 duration-500">
                                 <div className="p-8">
                                     <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <CheckCircle className="text-green-500 w-8 h-8" />
                                     </div>
-                                    <h2 className="text-2xl font-extrabold text-[#0F172A] mb-3">{headline || '¡Tu descarga está lista!'}</h2>
-                                    <p className="text-slate-600 font-medium leading-relaxed">
+                                    <h2 className="text-2xl font-extrabold !text-slate-900 mb-3">{headline || '¡Tu descarga está lista!'}</h2>
+                                    <p className="!text-slate-600 font-medium leading-relaxed">
                                         {message || 'Gracias por tu compra. Tu pedido está siendo procesado con éxito.'}
                                     </p>
                                 </div>
@@ -178,8 +178,7 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
                                                     )}
                                                 </div>
                                                 <div className="text-left">
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Producto Premium</p>
-                                                    <p className="text-[#0F172A] font-bold leading-tight">{product?.name || 'Video Masterclass: Estrategias de Venta 2024'}</p>
+                                                    <p className="!text-slate-900 font-bold leading-tight">{product?.name || 'Video Masterclass: Estrategias de Venta 2024'}</p>
                                                     <p className="text-[#0052FF] font-bold mt-1 text-sm">{product?.price || '$47.00'}</p>
                                                 </div>
                                             </div>

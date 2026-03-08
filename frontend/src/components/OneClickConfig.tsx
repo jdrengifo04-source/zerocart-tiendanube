@@ -227,7 +227,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                         <div className="mt-8 text-center">
                             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Vista Previa Móvil</h3>
 
-                            <div className="w-[320px] mx-auto bg-white rounded-[40px] border-[8px] border-slate-200 h-[640px] shadow-2xl overflow-hidden flex flex-col relative text-left">
+                            <div className="w-[320px] mx-auto bg-white rounded-[40px] border-[8px] border-slate-200 h-[640px] shadow-2xl overflow-hidden flex flex-col relative text-center">
                                 {/* Navigation Bar Tiendanube Style */}
                                 <div className="h-14 border-b border-slate-100 flex items-center justify-between px-5 shrink-0 bg-white">
                                     {/* Hamburger */}
@@ -244,7 +244,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto no-scrollbar pb-24 bg-white text-slate-900">
+                                <div className="flex-1 overflow-y-auto no-scrollbar pb-10 bg-white text-slate-900">
                                     {/* Product Image Carousel */}
                                     <div className="relative w-full aspect-square bg-white border-b border-slate-100 flex items-center justify-center overflow-hidden">
                                         {product?.image ? (
@@ -269,7 +269,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                             {product?.name || 'Producto de Ejemplo para Tienda'}
                                         </h1>
 
-                                        <div className="flex items-center gap-3 mb-5">
+                                        <div className="flex items-center justify-center gap-3 mb-5">
                                             <span className="text-2xl font-black text-slate-900">
                                                 $ {product?.promotional_price || product?.price || '299.00'}
                                             </span>
@@ -280,16 +280,18 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                             )}
                                         </div>
 
-                                        <div className="text-xs text-emerald-600 mb-6 flex items-center gap-1.5 font-bold bg-emerald-50 w-fit px-2.5 py-1 rounded">
+                                        <div className="text-xs text-emerald-600 mb-2 flex items-center gap-1.5 font-bold bg-emerald-50 w-fit px-2.5 py-1 rounded mx-auto">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                             Envío gratis disponible
                                         </div>
 
+                                        {/* Líneas de relleno para simular la descripción del producto */}
                                         <div className="space-y-3 opacity-60">
-                                            <div className="h-2.5 w-full bg-slate-100 rounded-full"></div>
-                                            <div className="h-2.5 w-5/6 bg-slate-100 rounded-full"></div>
-                                            <div className="h-2.5 w-4/6 bg-slate-100 rounded-full"></div>
+                                            <div className="h-2.5 w-full bg-slate-100 rounded-full mx-auto"></div>
+                                            <div className="h-2.5 w-5/6 bg-slate-100 rounded-full mx-auto"></div>
+                                            <div className="h-2.5 w-4/6 bg-slate-100 rounded-full mx-auto"></div>
                                         </div>
+```
                                     </div>
                                 </div>
 

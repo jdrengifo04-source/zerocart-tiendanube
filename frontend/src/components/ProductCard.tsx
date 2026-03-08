@@ -76,18 +76,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, saving, onLinkChange
                 <Button
                     onClick={() => onSave(product.id, product.googleDriveLink)}
                     disabled={saving}
-                    className="flex-1 h-10 rounded-xl bg-white dark:bg-primary text-slate-900 dark:text-white border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-primary/80 font-bold text-xs gap-2 shadow-sm dark:shadow-lg dark:shadow-black/5 transition-all"
+                    className="flex-[2] h-11 rounded-xl bg-[#0052FF] hover:bg-[#0045D9] text-white border-none hover:-translate-y-0.5 active:scale-[0.98] font-bold text-xs uppercase tracking-widest gap-2 shadow-[0_8px_20px_-4px_rgba(0,82,255,0.3)] transition-all duration-300 disabled:opacity-50 disabled:translate-y-0 disabled:scale-100"
                 >
-                    {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                    {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mb-0.5" />}
                     {saving ? 'Guardando...' : 'Actualizar'}
                 </Button>
                 <Button
                     variant="outline"
-                    className="w-10 h-10 p-0 rounded-xl border-slate-200 dark:border-white/10 text-slate-500 hover:text-primary transition-all"
+                    className="flex-1 h-11 rounded-xl border-slate-200 dark:border-white/10 text-slate-500 hover:text-[#0052FF] hover:border-[#0052FF]/30 hover:bg-[#0052FF]/5 hover:-translate-y-0.5 active:scale-[0.98] font-bold text-xs uppercase tracking-widest gap-2 transition-all duration-300"
                     onClick={() => product.googleDriveLink && window.open(product.googleDriveLink, '_blank')}
                     disabled={!product.googleDriveLink}
                 >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-4 h-4" />
+                    Abrir
                 </Button>
             </div>
         </div>

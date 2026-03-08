@@ -14,6 +14,7 @@ import ThankYouConfig from './components/ThankYouConfig';
 import WhatsAppButton from './components/WhatsAppButton';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfUse from './TermsOfUse';
+import Styleguide from './components/Styleguide';
 
 import { Button } from 'speed-code';
 
@@ -110,6 +111,11 @@ function App() {
       (filterStatus === 'unlinked' && !p.googleDriveLink);
     return matchesSearch && matchesFilter;
   });
+
+  // Check for styleguide route
+  if (window.location.pathname === '/styleguide') {
+    return <Styleguide />;
+  }
 
   return (
     <div className="flex h-screen bg-[var(--bg-app)] font-jakarta text-[var(--text-main)] overflow-hidden theme-transition">
