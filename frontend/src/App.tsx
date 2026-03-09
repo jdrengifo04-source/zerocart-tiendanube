@@ -208,15 +208,14 @@ function App() {
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="bg-white dark:bg-white/5 rounded-3xl p-6 md:p-10 border border-slate-200/50 dark:border-white/5 shadow-sm premium-card">
                   <div className="w-full aspect-video bg-slate-100 dark:bg-black/50 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent dark:from-primary/10 opacity-50 transition-opacity group-hover:opacity-100"></div>
-                    <div className="text-center relative z-10 flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full bg-white dark:bg-white/10 flex items-center justify-center shadow-xl mb-4 text-primary group-hover:scale-110 transition-transform duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="ml-1">
-                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                      </div>
-                      <p className="text-slate-500 font-bold dark:text-slate-400">Espacio para Video Tutorial</p>
-                    </div>
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/embed/5s6hB_5-dlw"
+                      title="Tutorial de Configuración Zerocart"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    ></iframe>
                   </div>
                 </div>
               </div>

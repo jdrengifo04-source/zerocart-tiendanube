@@ -25,9 +25,8 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             }
         });
 
-        if (!store || !store.oneClickEnabled) {
-            // Si no existe la tienda o no está activada la opción
-            return res.type('application/javascript').send('console.log("🚀 Zerocart: Función 1 Click $ deshabilitada para esta tienda.");');
+        if (!store) {
+            return res.status(404).send('console.error("Zerocart: Tienda no encontrada");');
         }
 
         const protocol = req.headers['x-forwarded-proto'] || req.protocol;
@@ -35,7 +34,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 
         const scriptContent = `
 (function () {
-    console.log('🚀 Zerocart: Botón "${store.oneClickText}" activado.');
+    ${store.oneClickEnabled ? `console.log('🚀 Zerocart: Botón "${store.oneClickText}" activado.');` : 'console.log("🚀 Zerocart: Script cargado (Página de Gracias activa).");'}
 
     const ADD_TO_CART_SELECTORS = [
         '.js-addtocart',
@@ -55,6 +54,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
     ];
 
     function initBuyNow() {
+        if (!${store.oneClickEnabled}) return;
         console.log('🔍 Zerocart: Buscando botón de compra...');
         let addToCartBtn = null;
         for (const selector of ADD_TO_CART_SELECTORS) {
