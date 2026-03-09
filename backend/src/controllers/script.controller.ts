@@ -161,7 +161,33 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                 }
 
                 console.log('[ZeroCart] Initiating 1-Click for product:', productId);
-                window.location.href = '/checkout/v3/start?add_to_cart=' + productId + '&quick_buy=1';
+                
+                const response = await fetch('/comprar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        'add_to_cart': productId,
+                        'quantity': '1'
+                    })
+                });
+                
+                const cartData = await response.json();
+                console.log('[ZeroCart] Cart created:', cartData);
+
+                if (cartData.cart && cartData.cart.id && cartData.cart.token) {
+                    // Flujo ideal: Redirect directo con tokens de V3
+                    window.location.href = '/checkout/v3/start/' + cartData.cart.id + '/' + cartData.cart.token + '?from_store=1';
+                } else if (cartData.cart && cartData.cart.abandoned_checkout_url) {
+                    // Fallback 1: URL de checkout abandonado (que es v3 start)
+                    window.location.href = cartData.cart.abandoned_checkout_url;
+                } else {
+                    // Fallback Final: Reintentar con el botón nativo si todo falla
+                    console.warn('[ZeroCart] No tokens found, falling back to native flow.');
+                    addToCartBtn.click();
+                }
                 
             } catch (err) {
                 console.error('[ZeroCart] Error in 1-Click:', err);
