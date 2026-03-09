@@ -21,6 +21,9 @@ export const handleTiendanubeCallback = async (req: Request, res: Response) => {
             create: {
                 id: data.user_id.toString(),
                 accessToken: data.access_token,
+                thankYouHeadline: "¡Tu compra ha sido aprobada!",
+                thankYouMessage: "Gracias por tu compra. Aquí tienes tu enlace de descarga.",
+                thankYouShowImage: true
             }
         });
 

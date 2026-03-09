@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 export const serveDynamicScript = async (req: Request, res: Response) => {
     try {
-        const storeId = req.query.store_id as string;
+        const storeId = (req.query.store_id || req.query.store) as string;
 
         if (!storeId) {
+            console.error('❌ Error: Falta store_id o store en la query', req.query);
             return res.status(400).send('console.error("Zerocart: Faltó indicar el store_id en el script");');
         }
 

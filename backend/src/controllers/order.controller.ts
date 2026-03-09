@@ -5,7 +5,8 @@ import prisma from '../lib/prisma.js';
 // GET /api/order/details?cart_id=...&store_id=...
 export const getOrderDetails = async (req: Request, res: Response) => {
     try {
-        const { cart_id, store_id } = req.query;
+        const cart_id = (req.query.cart_id || req.query.cart) as string;
+        const store_id = (req.query.store_id || req.query.store) as string;
 
         console.log(`🔍 Consultando detalles del carrito #${cart_id} para tienda ${store_id}`);
 
