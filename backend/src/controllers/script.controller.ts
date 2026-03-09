@@ -137,114 +137,72 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         const container = document.createElement('div');
         container.id = 'zerocart-container';
 
-        const buyNowBtn = document.createElement('button');
-        buyNowBtn.id = 'zerocart-buy-now';
-        buyNowBtn.innerHTML = \`⚡ \${store.oneClickText || 'Comprar Ahora'}\`;
-        buyNowBtn.type = 'button';
-
-        container.appendChild(buyNowBtn);
         
-        // Insertar el contenedor después de la columna de añadir al carrito o en el formulario
-        // Buscamos un contenedor más amplio para que el width: 100% funcione mejor
-        const mainContainer = addToCartBtn.closest('form') || addToCartBtn.parentNode;
-        mainContainer.appendChild(container);
-
-        buyNowBtn.onclick = async function (e) {
-            e.preventDefault();
-            buyNowBtn.innerHTML = 'Procesando...';
-            buyNowBtn.disabled = true;
-
-            let productId = null;
-            let variantId = null;
-            const form = addToCartBtn.closest('form');
-            
-            if (form) {
-                const variantInput = form.querySelector('input[name="variant_id"]');
-                const addToCartInput = form.querySelector('input[name="add_to_cart"]');
-                
-                if (addToCartInput && addToCartInput.value) {
-                    productId = addToCartInput.value;
-                }
-                if (variantInput && variantInput.value) {
-                    variantId = variantInput.value;
-                }
-            }
-
-            // Fallback para Product ID desde LS si no está en el form
-            if (!productId && window.LS && window.LS.product) {
-                productId = window.LS.product.id;
-            }
-
-            if (!productId) {
-                console.error('❌ Zerocart: No se pudo identificar el Product ID.');
-                alert('Lo sentimos, intenta con el botón normal.');
-                addToCartBtn.style.display = 'block';
-                buyNowBtn.remove();
-                return;
-            }
-
-            console.log('🚀 Zerocart: Iniciando compra para Product ID:', productId);
-
+        const buyBtn = document.createElement('button');
+        buyBtn.id = 'zerocart-buy-now';
+        buyBtn.innerText = '${store.oneClickText || 'COMPRAR AHORA'}';
+        
+        buyBtn.onclick = async function() {
             try {
-                // Usamos /comprar/ porque es el endpoint que maneja la lógica de carrito en muchos temas
-                const response = await fetch('/comprar/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: new URLSearchParams({
-                        'add_to_cart': productId,
-                        'quantity': '1'
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ Zerocart: Respuesta recibida:', data);
-
-                    if (data.success && data.cart) {
-                        const cartId = data.cart.id;
-                        const cartToken = data.cart.token;
-                        // Construimos la URL de checkout directo usando concatenación para evitar problemas con backticks
-                        const checkoutUrl = '/checkout/v3/start/' + cartId + '/' + cartToken + '?from_store=1';
-                        console.log('🔗 Zerocart: Redirigiendo a checkout:', checkoutUrl);
-                        window.location.href = checkoutUrl;
-                    } else if (data.cart && data.cart.abandoned_checkout_url) {
-                        // Fallback a la URL de checkout abandonado si existe
-                        console.log('🔗 Zerocart: Redirigiendo a abandoned_checkout_url');
-                        window.location.href = data.cart.abandoned_checkout_url;
-                    } else {
-                        // Último recurso: URL de carrito normal
-                        console.log('🔗 Zerocart: Redirigiendo a cartUrl fallback');
-                        window.location.href = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
-                    }
-                } else {
-                    throw new Error('Fallo en la API de Tiendanube');
+                buyBtn.disabled = true;
+                buyBtn.innerText = 'PROCESANDO...';
+                
+                const productForm = addToCartBtn.closest('form');
+                let productId = '';
+                
+                if (productForm) {
+                    const idInput = productForm.querySelector('input[name="add_to_cart"]');
+                    if (idInput) productId = idInput.value;
                 }
-            } catch (error) {
-                console.error('❌ Zerocart Error:', error);
-                const fallbackUrl = (window.LS && window.LS.cartUrl) ? window.LS.cartUrl : '/comprar/';
-                window.location.href = fallbackUrl;
+                
+                if (!productId) {
+                    const urlParts = window.location.pathname.split('-');
+                    productId = urlParts[urlParts.length - 1].replace('/', '');
+                }
+
+                console.log('[ZeroCart] Initiating 1-Click for product:', productId);
+                window.location.href = '/checkout/v3/start?add_to_cart=' + productId + '&quick_buy=1';
+                
+            } catch (err) {
+                console.error('[ZeroCart] Error in 1-Click:', err);
+                buyBtn.disabled = false;
+                buyBtn.innerText = '${store.oneClickText || 'COMPRAR AHORA'}';
+                addToCartBtn.click();
             }
         };
+
+        container.appendChild(buyBtn);
+        addToCartBtn.parentNode.insertBefore(container, addToCartBtn.nextSibling);
     }
 
-    function initThankYouPage() {
-        if (!window.location.pathname.includes('/checkout/v3/success/')) return;
-        
-        console.log('🎉 Zerocart: Página de éxito detectada. Buscando detalles del pedido...');
+    // --- THANK YOU PAGE LOGIC ---
+    let tyInitialized = false;
+    let retryCount = 0;
 
-        // Intentar obtener el ID del pedido de la URL
-        // La URL suele ser /checkout/v3/success/ORDER_ID/ORDER_TOKEN
-        const pathParts = window.location.pathname.split('/');
+    function initThankYouPage() {
+        const path = window.location.pathname;
+        if (!path.includes('/success')) {
+            tyInitialized = false;
+            return;
+        }
+
+        if (tyInitialized) return;
+
+        const pathParts = path.split('/');
         const successIdx = pathParts.indexOf('success');
         const orderId = pathParts[successIdx + 1];
 
         if (!orderId) {
-            console.error('❌ Zerocart: No se pudo encontrar el ID del pedido en la URL.');
+            if (retryCount < 10) {
+                retryCount++;
+                console.log(\`[ZeroCart] ⏳ Waiting for Order ID in URL... (Attempt \${retryCount})\`);
+                setTimeout(initThankYouPage, 1000);
+            }
             return;
         }
+
+        tyInitialized = true;
+        console.log('[ZeroCart] 🎯 Success page reached. Fetching links for Order:', orderId);
 
         const backendUrl = '${hostUrl}';
         const storeId = '${storeId}';
@@ -254,14 +212,17 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             .then(data => {
                 if (data.products && data.products.length > 0) {
                     renderDownloadCard(data);
+                } else {
+                    console.log('[ZeroCart] ℹ️ No digital products found for this order.');
                 }
             })
-            .catch(err => console.error('❌ Zerocart: Error al obtener links digitales:', err));
+            .catch(err => {
+                console.error('[ZeroCart] ❌ Error fetching links:', err);
+                tyInitialized = false; // Allow retry on error
+            });
     }
 
     function renderDownloadCard(data) {
-        console.log('✅ Zerocart: Preparando tarjeta de descarga para', data.products.length, 'productos.');
-
         if (!document.getElementById('zerocart-thanks-styles')) {
             const style = document.createElement('style');
             style.id = 'zerocart-thanks-styles';
@@ -273,14 +234,18 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                     padding: 25px;
                     margin: 20px auto;
                     max-width: 800px;
-                    width: 90%;
+                    width: 95%;
                     box-shadow: 0 10px 25px rgba(0, 82, 255, 0.1);
-                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     text-align: center;
                     position: relative;
-                    z-index: 999999;
+                    z-index: 99;
                     box-sizing: border-box;
-                    display: block !important;
+                    animation: zerocart-fade-in 0.5s ease-out;
+                }
+                @keyframes zerocart-fade-in {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 .zerocart-thanks-headline {
                     color: #1a1a1a;
@@ -304,6 +269,7 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                     margin-bottom: 15px;
                     text-align: left;
                     gap: 15px;
+                    border: 1px solid #edf2ff;
                 }
                 .zerocart-item-img {
                     width: 60px;
@@ -329,10 +295,11 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
                     font-weight: 600;
                     font-size: 14px;
                     display: inline-block;
-                    transition: background 0.2s;
+                    transition: all 0.2s;
                 }
                 .zerocart-item-btn:hover {
                     background: #0041cc;
+                    transform: scale(1.02);
                 }
             \`;
             document.head.appendChild(style);
@@ -360,36 +327,39 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
             </div>
         \`;
 
-        // Función para inyectar si no existe (robusto contra SPAs de Tiendanube)
         function inject() {
-            if (document.getElementById('zerocart-thank-you')) {
-                return; // Ya existe 
-            }
+            if (document.getElementById('zerocart-thank-you')) return;
             
-            console.log('✅ Zerocart: Renderizando (o re-renderizando) tarjeta en el DOM.');
             const card = document.createElement('div');
             card.id = 'zerocart-thank-you';
             card.innerHTML = htmlContent;
 
-            // Intentar encontrar el contenedor principal del checkout V3
-            const targetNode = document.querySelector('.checkout__container') || 
-                               document.querySelector('.checkout-container') || 
-                               document.querySelector('main') || 
-                               document.querySelector('#proccess-success') ||
-                               document.body;
-                               
-            targetNode.prepend(card);
+            const target = document.querySelector('.checkout-container') || 
+                           document.querySelector('.checkout__container') || 
+                           document.querySelector('main') || 
+                           document.body;
+                           
+            if (target) {
+                target.prepend(card);
+            }
         }
 
-        // Inyectar inmediatamente
         inject();
-
-        // Chequear cada 1 segundo si el SPA de Tiendanube borró nuestro elemento al renderizar
-        setInterval(inject, 1000);
+        setInterval(inject, 1500); // Guard against SPA re-renders
     }
 
+    // --- BOOTSTRAP ---
+    let lastUrl = location.href;
+    setInterval(() => {
+        if (location.href !== lastUrl) {
+            lastUrl = location.href;
+            console.log('[ZeroCart] 🔄 Navigation detected. Checking for Success page...');
+            initThankYouPage();
+        }
+    }, 1000);
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             initBuyNow();
             initThankYouPage();
         });
