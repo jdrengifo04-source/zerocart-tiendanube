@@ -47,3 +47,22 @@ The logic is injected dynamically via `script.controller.ts`. It also handles:
 - **Zero Friction**: One click leads directly to the payment/shipping info.
 - **Reliability**: Uses Tiendanube's internal tokens to ensure the cart isn't empty on arrival.
 - **Conversion**: Reduces steps in the purchasing funnel for digital products.
+
+## ⚠️ 2026 Fix: The 404 Error on Direct Redirect
+A recent update revealed that redirecting directly to `/checkout/v3/start?add_to_cart=ID` can cause **404 Errors** or empty carts in some themes because the session isn't initialized correctly.
+
+**The Solution (Restored):**
+We must always call the AJAX endpoint `/comprar/` first to get the official `cart.id` and `cart.token`.
+
+```javascript
+const response = await fetch('/comprar/', { 
+    method: 'POST', 
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: new URLSearchParams({ 'add_to_cart': productId, 'quantity': '1' })
+});
+const data = await response.json();
+
+// 🚀 Safe redirection
+window.location.href = `/checkout/v3/start/${data.cart.id}/${data.cart.token}?from_store=1`;
+```
+This guarantees that Tiendanube recognizes the checkout session as valid and populated.

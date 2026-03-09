@@ -52,3 +52,11 @@ El modelo de datos se divide en:
 
 ## Manejo de Archivos Estáticos
 En producción, el backend sirve los archivos compilados del frontend (`client-dist`) y los scripts públicos (`public/scripts`). Esto permite que todo el sistema corra en un solo contenedor Docker.
+
+## 5. Sistema de Versionado (Estratégico)
+Se ha identificado una discrepancia entre las versiones locales y las de producción en Tiendanube que puede causar confusión.
+
+- **Versión de Tiendanube (File ID)**: Tiendanube incrementa un contador interno de versión cada vez que se sube/actualiza un archivo en el portal de partners (ej. v13, v25). **No** tenemos control sobre este número.
+- **Versión Interna de Zerocart**: Marcamos nuestro código con etiquetas de versión claras (ej. `V32-FinalFix`) que se imprimen en la consola del navegador: `[ZeroCart] 🛡️ Checkout Extension V32...`.
+
+**Recomendación**: Siempre verificar la versión en los logs de la consola antes de diagnosticar, ignorando el número que muestre la interfaz de Tiendanube.

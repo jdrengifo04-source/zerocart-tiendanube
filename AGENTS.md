@@ -35,11 +35,8 @@ El proyecto es un monorepo simplificado:
 - 🔄 (En curso) Implementación de sistema multi-tienda (persistencia de tokens por tienda).
 - 🔄 (Pendiente) Flujo completo de cobro de comisiones vía Webhooks.
 
-### 💡 Aprendizajes Críticos (Quick Ref para el futuro)
-- **Layout Stacking (NubeSDK)**: Los contenedores `box` a veces apilan elementos horizontalmente por defecto. **Siempre** usa `direction: "col"` y refuerza con `display: "flex"`, `flexDirection: "column"` en el objeto `style`.
-- **Identificación de Tienda**: Usa `nube.getState().store.id` para obtener el ID de la tienda. Evita parsear `window.location`.
-- **Evitar Cache**: Al actualizar la extensión, usa versionado en el nombre del archivo (ej. `index.v26.1.js`) en lugar de sobrescribir el mismo, para evitar el cache del CDN. Esto es vital en Tiendanube.
 - **Async UI**: Inicia el renderizado con datos locales (placeholder) y actualiza con `nube.render` una vez que el `fetch` al backend resuelva los datos reales del producto.
+- **Versión de Tiendanube vs Interna**: Tiendanube tiene un contador interno de "Versiones" (ej. v13, v25) que incrementa cada vez que subes un archivo. **Nuestra versión interna** (ej. V32) se escribe en los logs de la consola (`[ZeroCart] 🛡️ Checkout Extension V32...`) para poder identificar qué código está corriendo realmente.
 
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)
@@ -52,67 +49,32 @@ El proyecto es un monorepo simplificado:
 
 ## 📘 Guía Técnica: Botón "1 Click" (Comprar Ahora) y Página de Gracias
 
-Esta sección documenta cómo funciona exactamente la inyección del botón "Comprar Ahora" y la "Página de Gracias", para poder diagnosticar y reparar si en el futuro algo se rompe debido a cambios en los temas de Tiendanube.
+### 💡 Aprendizajes Críticos (Quick Ref para el futuro)
+- **Navegación V3**: No usar query params directos para el checkout (`?add_to_cart`). Siempre usar el flujo AJAX.
+- **Entorno Restringido**: No existe `document` en el Checkout. Toda la UI es declarativa vía `nube.render`.
+- **Versionado**: Ignorar el contador de Tiendanube; verificar la versión en el log de consola (`V32-FinalFix`).
 
-### 1. Arquitectura Central del Script Inyectado
-El sistema funciona a través de un script de inyección configurado en el Portal de Partners de Tiendanube:
-1. **Punto de Entrada**: La tienda carga un script estático o dinámico que nuestro backend provee a través del endpoint `/api/scripts/buy-now.js?store_id=XXXX`.
-2. **Contexto**: El script se ejecuta en el navegador del comprador final.
-3. **Restricción de Ambientes**: **Es crítico** que el script esté autorizado en el Portal de Partners para ejecutarse tanto en el entorno de la **Tienda (Storefront)** como en el **Checkout**, de lo contrario la página de gracias no funcionará.
+## 📁 Documentación Detallada (Click para ver detalles)
+- [🏗️ Arquitectura General](docs/ARCHITECTURE.md): Flujo de datos, Prisma, y sistema de versionado.
+- [🛒 One-Click Checkout (Botón Buy Now)](docs/ONE_CLICK_CHECKOUT.md): Detalles del flujo AJAX `/comprar/` y solución al error 404.
+- [🎉 Extensión de Checkout (Página de Gracias)](docs/NUBE_SDK_EXTENSION.md): Arquitectura NubeSDK, manejo de estado V32 y prevención de parpadeo.
+- [🌐 Guía de Tiendanube](docs/TIENDANUBE.md): OAuth, Scopes y Webhooks.
+- [🚀 Despliegue y Ops](docs/DEPLOYMENT.md): Docker, Hostinger y EasyPanel.
 
-### 2. Flujo Completo: Botón "Comprar Ahora" (1 Click $)
-El objetivo es saltarse el carrito intermedio y enviar al cliente directo a pagar.
+---
 
-- **Detección del Botón Original**: El script busca el botón de "Agregar al carrito" nativo usando selectores comunes (Ej. `.js-addtocart`, `.js-prod-submit-form`).
-- **Reemplazo Visual**: Oculta el botón nativo, oculta los selectores de cantidad (usando `.js-quantity`) e inyecta un nuevo botón `id="zerocart-buy-now"` estilizado con la configuración de la base de datos de la tienda.
-- **Acción (Click)**:
-  1. Extrae el `Product ID` y `Variant ID` de los `<input>` ocultos del formulario nativo de Tiendanube o del objeto global `window.LS.product.id`.
-  2. Realiza una petición `POST` AJAX en segundo plano hacia el endpoint relativo de la misma tienda: `/comprar/`. (Pasando el `add_to_cart=ID` y `quantity=1`).
-  3. Tiendanube responde con un JSON que contiene la información del carrito recién creado (`cart_id` y `cart_token`).
-  4. El script construye la URL de checkout directo: `/checkout/v3/start/{cart_id}/{cart_token}?from_store=1`.
-  5. Finalmente, redirige al usuario a esa URL, logrando el flujo de "Un solo clic".
+### Resumen Técnico de Decisiones Críticas
 
-- **Respuesta y Renderizado (NubeSDK)**: Si el pedido es pago, el backend devuelve los enlaces. La extensión, corriendo dentro del **Web Worker** del Checkout, utiliza `nube.render("after_main_content", [...])` empleando objetos JSON que respetan el esquema estricto de `@tiendanube/nube-sdk-types`.
+#### 1. Botón "Comprar Ahora" (1 Click $)
+Para evitar carritos vacíos y errores 404, el sistema inyecta un botón que realiza un `POST` previo a `/comprar/` para obtener los tokens de sesión (`id` y `token`) antes de redirigir a `/checkout/v3/start/`.
+> Ver detalle en: [ONE_CLICK_CHECKOUT.md](docs/ONE_CLICK_CHECKOUT.md)
 
-### 3. Estructura Exacta de Componentes NubeSDK (Checkout V3)
-Debido a que el entorno restringe el uso de React/JSX directamente sin compilación compleja, si construyes los componentes a mano (como en Vanilla JS/TS compilado con tsup), debes usar la estructura **exacta** que espera la plataforma.
+#### 2. Página de Gracias (V32 Final Fix)
+Debido a que el Checkout V3 corre en un Web Worker, se eliminaron todas las referencias a `document`. Se implementó un control de estado (`lastRenderedOrderId`) para evitar que la página parpadee infinitamente durante los re-renderizados de Tiendanube.
+> Ver detalle en: [NUBE_SDK_EXTENSION.md](docs/NUBE_SDK_EXTENSION.md)
 
-**Sintaxis Definitiva:**
-Los objetos nativos NO usan `{ component: "Box", props: {} }`. La propiedad clave es `type` (en minúsculas), y el contenido se pasa en `children`.
-```javascript
-// ✅ CORRECTO:
-{
-  type: "box",
-  background: "#f4f4f4",
-  padding: "16px",
-  children: [
-     {
-        type: "txt", // Textos van con type "txt" (mira types/components.ts)
-        modifiers: ["bold"],
-        children: "Descarga lista"
-     },
-     {
-        type: "link",
-        href: "https://drive.google.com/...",
-        target: "_blank",
-        children: "Descargar"
-     }
-  ]
-}
-
-// ❌ INCORRECTO:
-{ component: "Box", props: { children: "..." } } // Falla silenciosamente o da "Component undefined"
-{ type: "Box" } // Mayúsculas no reconocidas en "type"
-```
-
-*(Nota: El flujo antiguo vía inyección directa al DOM ya NO es viable en Checkout V3 debido a restricciones de seguridad. Toda interacción gráfica debe usar la librería `nube-sdk-jsx` compilada en un único archivo `index.global.js` o construyendo los objetos puros como se describe arriba).*
-
-### 4. Flujo Alternativo: Entrega por Correo (Fallback)
-Ante las estrictas limitaciones del Sandbox del Checkout V3 (que elimina el acceso al DOM), se desarrolló un plan B robusto:
-- **Webhook**: Cuando la compra se completa, Tiendanube dispara el webhook `order/paid` hacia `/api/webhooks/order-paid`.
-- **Detección de Productos Digitales**: El backend busca si los productos comprados tienen un enlace de Google Drive asociado en la base de datos de Zerocart.
-- **Servicio de Email (`email.service.ts`)**: Si hay productos digitales, el backend utiliza `nodemailer` (configurado con SMTP o Resend en producción) para compilar una plantilla HTML.
-- **Envío Automático**: El cliente recibe un correo instantáneo titulado "¡Tus productos digitales están listos!" (o el título personalizado de la tienda) con el botón directo a Google Drive, saltándose por completo la necesidad de modificar el frontend del checkout.
+#### 3. Fallback de Entrega
+Ante cualquier falla de la UI del checkout, el sistema dispara un Webhook que envía los enlaces por email automáticamente.
 
 ### 5. Key Learnings (Aprendizajes Clave)
 - **Script Activation**: En el Portal de Partners, para inyectar scripts, usa el evento `onfirstinteraction`. El evento `onload` puede ser bloqueado o ejecutarse demasiado temprano en algunos temas.
