@@ -8,8 +8,7 @@ import {
     AlignLeft,
     Image as ImageIcon,
     CheckCircle,
-    Package,
-    Palette, Expand, Zap, Save
+    Package
 } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { toast } from 'sonner';
