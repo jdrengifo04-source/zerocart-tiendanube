@@ -43,6 +43,7 @@ El proyecto es un monorepo simplificado:
 - [Solución Redirección One-Click](docs/ONE_CLICK_CHECKOUT.md)
 - [Arquitectura NubeSDK (Checkout V3 Web Worker)](docs/NUBESDK_ARCHITECTURE.md)
 - [Extensión Checkout V3 (NubeSDK)](docs/NUBE_SDK_EXTENSION.md)
+- [🎨 UI, Feedback y Estados](docs/UI_AND_FEEDBACK.md)
 - [Guía de Despliegue y Ops](docs/DEPLOYMENT.md)
 - [Flujo de Tiendanube (Auth & Webhooks)](docs/TIENDANUBE.md)
 
@@ -59,6 +60,7 @@ El proyecto es un monorepo simplificado:
 - [🛒 One-Click Checkout (Botón Buy Now)](docs/ONE_CLICK_CHECKOUT.md): Detalles del flujo AJAX `/comprar/` y solución al error 404.
 - [🎉 Extensión de Checkout (Página de Gracias)](docs/NUBE_SDK_EXTENSION.md): Arquitectura NubeSDK, manejo de estado V32 y prevención de parpadeo.
 - [🌐 Guía de Tiendanube](docs/TIENDANUBE.md): OAuth, Scopes y Webhooks.
+- [🎨 UI y Feedback](docs/UI_AND_FEEDBACK.md): Funcionamiento de estados Activo/Inactivo y sistema de Toasts.
 - [🚀 Despliegue y Ops](docs/DEPLOYMENT.md): Docker, Hostinger y EasyPanel.
 
 ---

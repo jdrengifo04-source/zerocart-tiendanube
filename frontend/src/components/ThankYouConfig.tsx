@@ -8,9 +8,12 @@ import {
     AlignLeft,
     Image as ImageIcon,
     CheckCircle,
-    Package
+    Package,
+    Palette, Expand, Zap, Save
 } from "lucide-react";
 import { Switch } from "./ui/switch";
+import { toast } from 'sonner';
+import StatusBadge from './StatusBadge';
 
 interface Product {
     id: number;
@@ -29,8 +32,9 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
     const [headline, setHeadline] = useState('¡Tu descarga está lista!');
     const [message, setMessage] = useState('Gracias por tu compra. Aquí tienes los enlaces de tus productos digitales.');
     const [showImage, setShowImage] = useState(true);
+    const [isEnabled, setIsEnabled] = useState(true); // New state for thankYouEnabled
 
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true); // Renamed from isLoading
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
@@ -38,13 +42,16 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
             try {
                 const response = await axios.get('/api/store/config');
                 const config = response.data;
-                setHeadline(config.thankYouHeadline || '¡Tu descarga está lista!');
-                setMessage(config.thankYouMessage || 'Gracias por tu compra. Aquí tienes los enlaces de tus productos digitales.');
-                setShowImage(config.thankYouShowImage !== undefined ? config.thankYouShowImage : true);
+                if (config) {
+                    setIsEnabled(config.thankYouEnabled ?? true); // Set new state
+                    setHeadline(config.thankYouHeadline || '¡Tu descarga está lista!');
+                    setMessage(config.thankYouMessage || 'Gracias por tu compra. Aquí tienes los enlaces de tus productos digitales.');
+                    setShowImage(config.thankYouShowImage !== undefined ? config.thankYouShowImage : true);
+                }
             } catch (error) {
                 console.error('Error fetching Thank You config', error);
             } finally {
-                setIsLoading(false);
+                setLoading(false); // Use setLoading
             }
         };
         fetchConfig();
@@ -53,21 +60,23 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await axios.patch('/api/store/config', {
+            const configData = {
+                thankYouEnabled: isEnabled,
                 thankYouHeadline: headline,
                 thankYouMessage: message,
                 thankYouShowImage: showImage
-            });
-            alert('Configuración de la página de Gracias guardada');
+            };
+            await axios.patch('/api/store/config', configData);
+            toast.success('Configuración de la página de Gracias guardada'); // Replaced alert with toast
         } catch (error) {
             console.error('Error saving config', error);
-            alert('Hubo un error al guardar la configuración');
+            toast.error('Hubo un error al guardar la configuración'); // Replaced alert with toast
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (isLoading) {
+    if (loading) { // Use loading
         return (
             <div className="flex items-center justify-center p-20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -81,6 +90,22 @@ const ThankYouConfig: React.FC<ThankYouConfigProps> = ({ product }) => {
                 {/* CONFIGURATION PANEL */}
                 <div className="space-y-6">
                     <Card className="bg-[var(--bg-card)] p-8 rounded-[var(--radius-xl)] border-[var(--border-main)] shadow-[var(--shadow-soft)] premium-card space-y-8">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-xl font-bold text-slate-800 dark:text-white">General</h2>
+                                <StatusBadge status={isEnabled} />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-slate-500">{isEnabled ? 'Activado' : 'Desactivado'}</span>
+                                <Switch
+                                    checked={isEnabled}
+                                    onCheckedChange={setIsEnabled}
+                                />
+                            </div>
+                        </div>
+
+                        <hr className="border-[var(--border-main)] opacity-50" />
+
                         <div>
                             <h4 className="text-sm font-bold text-[var(--text-main)] uppercase tracking-wider mb-4 flex items-center gap-2">
                                 <Type size={16} className="text-[var(--primary-fixed)]" />

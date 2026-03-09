@@ -21,6 +21,7 @@ export const getStoreConfig = async (req: Request, res: Response) => {
                 oneClickBgColor: true,
                 oneClickTextColor: true,
                 oneClickSize: true,
+                thankYouEnabled: true,
                 thankYouHeadline: true,
                 thankYouMessage: true,
                 thankYouShowImage: true,
@@ -53,6 +54,7 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
             oneClickBgColor,
             oneClickTextColor,
             oneClickSize,
+            thankYouEnabled,
             thankYouHeadline,
             thankYouMessage,
             thankYouShowImage
@@ -66,6 +68,7 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
                 oneClickBgColor,
                 oneClickTextColor,
                 oneClickSize,
+                thankYouEnabled,
                 thankYouHeadline,
                 thankYouMessage,
                 thankYouShowImage
@@ -76,6 +79,7 @@ export const updateStoreConfig = async (req: Request, res: Response) => {
                 oneClickBgColor: true,
                 oneClickTextColor: true,
                 oneClickSize: true,
+                thankYouEnabled: true,
                 thankYouHeadline: true,
                 thankYouMessage: true,
                 thankYouShowImage: true,

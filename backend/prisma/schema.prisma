@@ -28,6 +28,7 @@ model Store {
   updatedAt         DateTime  @updatedAt
   
   // Configuración de Página de Gracias (Phase 2)
+  thankYouEnabled   Boolean   @default(true)
   thankYouHeadline  String    @default("¡Tu compra ha sido aprobada!")
   thankYouMessage   String    @default("Gracias por tu compra. Aquí tienes tu enlace de descarga.")
   thankYouShowImage Boolean   @default(true)

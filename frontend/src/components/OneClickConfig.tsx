@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Card, Button, Input } from 'speed-code';
 import { Check, Palette, Expand, Zap, ImageIcon, Loader2 } from 'lucide-react';
 import { Switch } from './ui/switch';
+import { toast } from 'sonner';
+import StatusBadge from './StatusBadge';
 
 interface Product {
     id: number;
@@ -19,8 +21,8 @@ interface OneClickConfigProps {
 
 const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
     const [isEnabled, setIsEnabled] = useState(false);
-    const [buttonText, setButtonText] = useState('Comprar Ahora');
-    const [bgColor, setBgColor] = useState('#0052FF'); // Primary Brand Color
+    const [buttonText, setButtonText] = useState('Comprar ahora');
+    const [bgColor, setBgColor] = useState('#006EFF'); // Default Blue
     const [textColor, setTextColor] = useState('#FFFFFF');
     const [buttonSize, setButtonSize] = useState<'normal' | 'grande' | 'completo'>('normal');
 
@@ -32,11 +34,11 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
             try {
                 const response = await axios.get('/api/store/config');
                 const config = response.data;
-                setIsEnabled(config.oneClickEnabled);
-                setButtonText(config.oneClickText);
-                setBgColor(config.oneClickBgColor);
-                setTextColor(config.oneClickTextColor);
-                setButtonSize(config.oneClickSize);
+                setIsEnabled(config.oneClickEnabled || false);
+                setButtonText(config.oneClickText || 'Comprar ahora');
+                setBgColor(config.oneClickBgColor || '#006EFF');
+                setTextColor(config.oneClickTextColor || '#FFFFFF');
+                setButtonSize(config.oneClickSize || 'normal');
             } catch (error) {
                 console.error('Error fetching One Click config', error);
             } finally {
@@ -66,10 +68,10 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                 }
             }
             console.log('Configuración guardada correctamente');
-            alert(isEnabled ? 'Configuración guardada y botón activado en tu tienda' : 'Configuración guardada y botón desactivado');
+            toast.success(isEnabled ? 'Configuración guardada y botón activado en tu tienda' : 'Configuración guardada y botón desactivado');
         } catch (error) {
             console.error('Error saving config', error);
-            alert('Hubo un error al guardar la configuración');
+            toast.error('Hubo un error al guardar la configuración');
         } finally {
             setIsSaving(false);
         }
@@ -102,12 +104,15 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                         <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-normal">Permite compras ultra rápidas</p>
                                     </div>
                                 </div>
-                                <Switch
-                                    checked={isEnabled}
-                                    onCheckedChange={(checked) => setIsEnabled(checked)}
-                                    size="default"
-                                    variant="brand"
-                                />
+                                <div className="flex items-center gap-2">
+                                    <StatusBadge status={isEnabled} />
+                                    <Switch
+                                        checked={isEnabled}
+                                        onCheckedChange={(checked) => setIsEnabled(checked)}
+                                        size="default"
+                                        variant="brand"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </Card>
@@ -291,7 +296,7 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                             <div className="h-2.5 w-5/6 bg-slate-100 rounded-full mx-auto"></div>
                                             <div className="h-2.5 w-4/6 bg-slate-100 rounded-full mx-auto"></div>
                                         </div>
-```
+                                        ```
                                     </div>
                                 </div>
 
@@ -307,14 +312,14 @@ const OneClickConfig: React.FC<OneClickConfigProps> = ({ product }) => {
                                         }}
                                         className={`
                                             transition-all duration-300 flex items-center justify-center tracking-wide font-bold
-                                            ${!isEnabled && 'w-full py-4 rounded-md text-[15px] hover:bg-slate-800'} 
-                                            ${isEnabled && buttonSize === 'normal' ? 'py-3.5 px-6 rounded-md text-[15px] mx-auto w-auto shadow-lg shadow-black/10' : ''}
-                                            ${isEnabled && buttonSize === 'grande' ? 'py-4 px-8 rounded-lg text-[16px] mx-auto w-auto shadow-xl shadow-black/10' : ''}
+                                            ${!isEnabled ? 'w-full py-4 rounded-md text-[15px] hover:bg-slate-800' : ''} 
+                                            ${isEnabled && buttonSize === 'normal' ? 'py-3.5 px-6 rounded-md text-[15px] mx-auto min-w-[180px] shadow-lg shadow-black/10' : ''}
+                                            ${isEnabled && buttonSize === 'grande' ? 'py-4 px-8 rounded-lg text-[16px] mx-auto min-w-[220px] shadow-xl shadow-black/10' : ''}
                                             ${isEnabled && buttonSize === 'completo' ? 'py-4 px-6 rounded-md text-[16px] w-full shadow-lg shadow-black/10' : ''}
                                         `}
                                     >
-                                        {isEnabled && <Zap size={18} fill="currentColor" strokeWidth={0} className="mr-2 opacity-90" />}
-                                        {isEnabled ? buttonText : 'Agregar al carrito'}
+                                        {isEnabled && <Zap size={18} fill="currentColor" className="mr-2 opacity-90" />}
+                                        {isEnabled ? (buttonText || 'Comprar ahora') : 'Agregar al carrito'}
                                     </button>
                                 </div>
                             </div>

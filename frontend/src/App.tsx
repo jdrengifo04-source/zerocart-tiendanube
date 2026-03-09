@@ -15,6 +15,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfUse from './TermsOfUse';
 import Styleguide from './components/Styleguide';
+import { Toaster, toast } from 'sonner';
 
 import { Button } from 'speed-code';
 
@@ -77,6 +78,7 @@ function App() {
       setError(null);
       const response = await axios.get('/api/products');
       setProducts(response.data);
+      toast.success('Productos sincronizados correctamente');
     } catch (error: any) {
       console.error('Error loading products:', error);
       const msg = error.response?.data?.error || 'Error al conectar con el servidor';
@@ -94,9 +96,10 @@ function App() {
     try {
       setSaving(productId);
       await axios.put('/api/products/link', { productId, googleDriveLink: link });
+      toast.success('Enlace de producto actualizado correctamente');
     } catch (error) {
       console.error('Error saving link:', error);
-      alert('Failed to save link');
+      toast.error('Error al guardar el enlace');
     } finally {
       setSaving(null);
     }
@@ -119,6 +122,7 @@ function App() {
 
   return (
     <div className="flex h-screen bg-[var(--bg-app)] font-jakarta text-[var(--text-main)] overflow-hidden theme-transition">
+      <Toaster position="top-right" richColors closeButton />
 
       <Sidebar
         activeTab={activeTab}
