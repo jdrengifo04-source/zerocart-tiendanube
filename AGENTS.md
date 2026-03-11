@@ -38,6 +38,9 @@ El proyecto es un monorepo simplificado:
 - **Async UI**: Inicia el renderizado con datos locales (placeholder) y actualiza con `nube.render` una vez que el `fetch` al backend resuelva los datos reales del producto.
 - **Versión de Tiendanube vs Interna**: Tiendanube tiene un contador interno de "Versiones" (ej. v13, v25) que incrementa cada vez que subes un archivo. **Nuestra versión interna** (ej. V32) se escribe en los logs de la consola (`[ZeroCart] 🛡️ Checkout Extension V32...`) para poder identificar qué código está corriendo realmente.
 
+## 🔗 Enlaces de Acceso Rápido
+- **URL de Instalación Tiendanube (OAuth):** [https://www.tiendanube.com/apps/27012/authorize](https://www.tiendanube.com/apps/27012/authorize) *(Usa este enlace para instalar la app en tiendas de prueba o producción)*
+
 ## 📁 Documentación Detallada
 - [Arquitectura Detallada](docs/ARCHITECTURE.md)
 - [Solución Redirección One-Click](docs/ONE_CLICK_CHECKOUT.md)
@@ -76,7 +79,7 @@ Debido a que el Checkout V3 corre en un Web Worker, se eliminaron todas las refe
 > Ver detalle en: [NUBE_SDK_EXTENSION.md](docs/NUBE_SDK_EXTENSION.md)
 
 #### 3. Fallback de Entrega
-Ante cualquier falla de la UI del checkout, el sistema dispara un Webhook que envía los enlaces por email automáticamente.
+Ante cualquier falla o cierre prematuro de la UI del checkout, el cliente puede volver a acceder a la Página de Confirmación desde el correo de compra estándar que envía automáticamente Tiendanube, donde el botón de descarga volverá a inicializarse.
 
 ### 5. Key Learnings (Aprendizajes Clave)
 - **Script Activation**: En el Portal de Partners, para inyectar scripts, usa el evento `onfirstinteraction`. El evento `onload` puede ser bloqueado o ejecutarse demasiado temprano en algunos temas.

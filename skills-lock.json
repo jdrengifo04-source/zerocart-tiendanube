@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "firecrawl": {
+      "source": "firecrawl/cli",
+      "sourceType": "github",
+      "computedHash": "92800eddd679aaa500e17caa5d595ceb1465f7e5d81a7d506f4e94feef3b5d78"
+    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
