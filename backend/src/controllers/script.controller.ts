@@ -37,16 +37,6 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
 (function () {
     ${store.oneClickEnabled ? `console.log('🚀 Zerocart: Botón "${store.oneClickText}" activado.');` : 'console.log("🚀 Zerocart: Script cargado (Página de Gracias activa).");'}
 
-    const ADD_TO_CART_SELECTORS = [
-        '.js-addtocart',
-        '.js-addtocart js-prod-submit-form',
-        '.js-prod-submit-form',
-        '.btn-add-to-cart',
-        'input[type="submit"].js-addtocart',
-        '#product_form input[type="submit"]',
-        '[data-store="product-buy-button"]'
-    ];
-
     const QUANTITY_SELECTORS = [
         '.js-quantity',
         '.form-group.js-quantity',
@@ -54,25 +44,31 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         '[data-component="product.quantity"]'
     ];
 
-    function initBuyNow() {
-        if (!${store.oneClickEnabled}) return;
-        console.log('🔍 Zerocart: Buscando botón de compra...');
-        let addToCartBtn = null;
-        for (const selector of ADD_TO_CART_SELECTORS) {
-            const btn = document.querySelector(selector);
-            if (btn && btn.offsetParent !== null) { // Verificar que sea visible
-                addToCartBtn = btn;
-                console.log('✅ Zerocart: Botón encontrado con selector:', selector);
-                break;
+    function findOriginalButton() {
+        // 1. Intentar por el Formulario (ID Oficial de Tiendanube)
+        const productForm = document.getElementById('product_form') || 
+                            document.querySelector('form[action*="/comprar/"]') ||
+                            document.querySelector('form:has(input[name="add_to_cart"])');
+        
+        if (productForm) {
+            const submitBtn = productForm.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitBtn && submitBtn.offsetParent !== null) return submitBtn;
+        }
+
+        // 2. Fallback semántico (por traducciones / data-attributes comunes)
+        const allButtons = Array.from(document.querySelectorAll('button, input[type="submit"], input[type="button"], a.btn'));
+        for (let btn of allButtons) {
+            if (btn.offsetParent === null) continue; // Skip hidden buttons
+            const text = (btn.innerText || btn.value || '').toLowerCase();
+            if (text.includes('comprar') || text.includes('agregar al carrito') || text.includes('add to cart') || text.includes('añadir al carrito')) {
+                return btn;
             }
         }
 
-        if (!addToCartBtn) {
-            // Reintentar en un momento si no se encuentra (algunos temas cargan dinámicamente)
-            setTimeout(initBuyNow, 2000);
-            return;
-        }
+        return null;
+    }
 
+    function injectBuyNowBtn(addToCartBtn) {
         if (document.getElementById('zerocart-buy-now')) return;
 
         addToCartBtn.style.display = 'none';
@@ -198,7 +194,44 @@ export const serveDynamicScript = async (req: Request, res: Response) => {
         };
 
         container.appendChild(buyBtn);
-        addToCartBtn.parentNode.insertBefore(container, addToCartBtn.nextSibling);
+        if (addToCartBtn.parentNode) {
+            addToCartBtn.parentNode.insertBefore(container, addToCartBtn.nextSibling);
+        } else {
+            const productForm = addToCartBtn.closest('form');
+            if (productForm) productForm.appendChild(container);
+        }
+    }
+
+    function initBuyNow() {
+        if (!${store.oneClickEnabled}) return;
+        console.log('🔍 Zerocart: Iniciando observador de botón de compra...');
+        
+        const checkForButton = () => {
+            if (document.getElementById('zerocart-buy-now')) return;
+            const btn = findOriginalButton();
+            if (btn) {
+                console.log('✅ Zerocart: Botón de compra original encontrado en el DOM.');
+                injectBuyNowBtn(btn);
+            }
+        };
+
+        // Ejecutar inmediatamente
+        checkForButton();
+
+        // Observar cambios en el DOM para temas dinámicos/SPA
+        const observer = new MutationObserver((mutations) => {
+            if (!document.getElementById('zerocart-buy-now')) {
+                checkForButton();
+            }
+        });
+        
+        if (document.body) {
+            observer.observe(document.body, { childList: true, subtree: true });
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                observer.observe(document.body, { childList: true, subtree: true });
+            });
+        }
     }
 
     // --- THANK YOU PAGE LOGIC ---
