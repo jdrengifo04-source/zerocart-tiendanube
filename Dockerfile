@@ -2,7 +2,7 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
@@ -10,7 +10,7 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 COPY backend/package*.json ./backend/
-RUN cd backend && npm install
+RUN cd backend && npm install --legacy-peer-deps --no-audit --no-fund
 
 # Copiar el código del backend
 COPY backend/ ./backend/
